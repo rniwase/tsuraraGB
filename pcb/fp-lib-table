@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name dmg-card)(type KiCad)(uri ${KIPRJMOD}/mod/dmg-card.pretty)(options "")(descr ""))
+  (lib (name pinheader)(type KiCad)(uri ${KIPRJMOD}/mod/pinheader.pretty)(options "")(descr ""))
+)

@@ -1,0 +1,6 @@
+(sym_lib_table
+  (lib (name TC74LCXR163245FT)(type Legacy)(uri ${KIPRJMOD}/lib/TC74LCXR163245FT.lib)(options "")(descr ""))
+  (lib (name TPS79901DDCR)(type Legacy)(uri ${KIPRJMOD}/lib/TPS79901DDCR.lib)(options "")(descr ""))
+  (lib (name dmg-card)(type Legacy)(uri ${KIPRJMOD}/lib/dmg-card.lib)(options "")(descr ""))
+  (lib (name SIT2001B)(type Legacy)(uri ${KIPRJMOD}/lib/SIT2001B.lib)(options "")(descr ""))
+)
