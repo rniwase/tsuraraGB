@@ -3,4 +3,6 @@
 *.kicad_wks linguist-detectable=true
 fp-lib-table linguist-detectable=true
 *.sch linguist-detectable=true
-
+*.sv linguist-detectable=true
+*.tcl linguist-detectable=true
+Makefile linguist-detectable=true

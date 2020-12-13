@@ -132,12 +132,12 @@ module cartridge_top (
   always_ff @(posedge clk_20M)
     cpu_reset <= ~load_done;
 
-  // L: read (GB -> cartridge), H: write (cartridge -> GB)
+  // L: read (cartridge -> GB), H: write (GB -> cartridge)
   assign bus_D_dir = bus_nRD | bus_A[15];
 
   logic [7:0] bus_D_out_buf;
   always_ff @(posedge clk_20M)
-	  bus_D_out_buf <= bus_A_s[0] ? spram_dout[15:8] : spram_dout[7:0];
+    bus_D_out_buf <= bus_A_s[0] ? spram_dout[15:8] : spram_dout[7:0];
 
   assign bus_D_out = bus_D_out_buf;
   assign bus_D_oe = {8{~(bus_nRD | bus_A[15])}};
