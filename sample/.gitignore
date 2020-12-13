@@ -1,0 +1,10 @@
+# For Lattice Radiant generated files
+*.rdf
+*.sty
+.*.ini
+*.xml
+*.html
+*.log
+.recovery
+*.dir/
+impl_1/
