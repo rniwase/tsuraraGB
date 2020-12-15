@@ -8,3 +8,9 @@
 .recovery
 *.dir/
 impl_1/
+
+# For GBDK generated files
+*.gb
+*.map
+*.noi
+
