@@ -48,12 +48,6 @@ void ROM_bank7(void) NONBANKED __preserves_regs(b, c, d, e) {
   WAIT_KEY_EVENT;
 }
 
-void ROM_bank8(void) NONBANKED __preserves_regs(b, c, d, e) {
-  SET_ROM_BANK(8);
-  printf("ROM Bank: 8\n");
-  WAIT_KEY_EVENT;
-}
-
 void main() {
   while (1) {
     ROM_bank1();
@@ -63,6 +57,5 @@ void main() {
     ROM_bank5();
     ROM_bank6();
     ROM_bank7();
-    ROM_bank8();
   }
 }
