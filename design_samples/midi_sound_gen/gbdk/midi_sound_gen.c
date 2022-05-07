@@ -1,6 +1,6 @@
 #include <gb/gb.h>
 #include <stdio.h>
-#include <gb/console.h>
+#include <gbdk/console.h>
 
 UBYTE noteon_prev;
 UBYTE noteon_now;
