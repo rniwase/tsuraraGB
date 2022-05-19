@@ -388,6 +388,7 @@
           "/1V2VO",
           "/3V3VO",
           "/VCC",
+          "/VCC0",
           "/VCCPLL",
           "/VPP",
           "GND"
