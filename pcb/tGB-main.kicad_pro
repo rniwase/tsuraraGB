@@ -349,7 +349,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "iCEboy-pcb.kicad_pro",
+    "filename": "tGB-main.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -409,7 +409,7 @@
     "last_paths": {
       "gencad": "",
       "idf": "",
-      "netlist": "iCEboy-pcb.net",
+      "netlist": "tGB-main.net",
       "specctra_dsn": "",
       "step": "",
       "vrml": ""
