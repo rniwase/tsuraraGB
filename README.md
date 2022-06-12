@@ -1,4 +1,5 @@
 # tsuraraGB
 Nintendo Gameboy cartridge-shaped FPGA (Lattice iCE40UP5K) development board
 
-![tsuraraGB Rev.A board](misc/board.jpg)
+![tsuraraGB Rev.B board](misc/tGB-topview.jpg)
+![tsuraraGB Rev.B board](misc/tGB-led.jpg)
