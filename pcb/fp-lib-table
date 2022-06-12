@@ -1,4 +1,4 @@
 (fp_lib_table
-  (lib (name "DMG-CardEdge")(type "KiCad")(uri "${KIPRJMOD}/mod/DMG-CardEdge.pretty")(options "")(descr ""))
-  (lib (name "pinheader")(type "KiCad")(uri "${KIPRJMOD}/mod/pinheader.pretty")(options "")(descr ""))
+  (lib (name "GB-CardEdge")(type "KiCad")(uri "${KIPRJMOD}/mod/GB-CardEdge.pretty")(options "")(descr ""))
+  (lib (name "PinHeader")(type "KiCad")(uri "${KIPRJMOD}/mod/PinHeader.pretty")(options "")(descr ""))
 )

@@ -1,4 +1,4 @@
-## iCEboy Pin constriants
+## tsuraraGB Pin constriants
 # Cartridge Address bus
 ldc_set_location -site {12} [get_ports {bus_A[0]}]
 ldc_set_location -site {13} [get_ports {bus_A[1]}]
