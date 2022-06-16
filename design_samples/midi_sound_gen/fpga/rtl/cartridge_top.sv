@@ -21,7 +21,10 @@ module cartridge_top (
 
   /* User I/O MIDI */
   input  logic        IO0,  // MIDI input
-  output logic        IO1   // MIDI output
+  output logic        IO1,  // MIDI output
+
+  /* unused */
+  output logic        vin
 );
 
   logic reset_n;
@@ -179,5 +182,7 @@ module cartridge_top (
     .din ({note_on_out, velocity_out >= 64, note_num_out >= 64}),
     .pad (LED)
   );
+
+  assign vin = 1'bx;
 
 endmodule

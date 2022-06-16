@@ -17,7 +17,12 @@ module cartridge_top (
   output logic        SPI_sck,
 
   /* LED */
-  output logic [ 2:0] LED
+  output logic [ 2:0] LED,
+
+  /* unused */
+  output logic        IO0,
+  output logic        IO1,
+  output logic        vin
 );
 
   logic reset_n;
@@ -146,5 +151,9 @@ module cartridge_top (
     .din (rom_bank[2:0]),
     .pad (LED          )
   );
+
+  assign IO0 = 1'bx;
+  assign IO1 = 1'bx;
+  assign vin = 1'bx;
 
 endmodule

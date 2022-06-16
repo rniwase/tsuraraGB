@@ -1,4 +1,4 @@
-CC=/opt/gbdk/bin/lcc -Wa-l -Wl-m -Wl-j
+CC=lcc -Wa-l -Wl-m -Wl-j
 
 build:
 	$(CC) -o midi_sound_gen.gb midi_sound_gen.c
