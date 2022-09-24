@@ -1,5 +1,5 @@
 (fp_lib_table
   (lib (name "Pin_Sidemount")(type "KiCad")(uri "${KIPRJMOD}/../common/mod/Pin_Sidemount.pretty")(options "")(descr ""))
-  (lib (name "ZX62-B-5PA")(type "KiCad")(uri "${KIPRJMOD}/../common/mod/ZX62-B-5PA.pretty")(options "")(descr ""))
   (lib (name "D_SOD-963")(type "KiCad")(uri "${KIPRJMOD}/../common/mod/D_SOD-963.pretty")(options "")(descr ""))
+  (lib (name "ZX62R-B-5P")(type "KiCad")(uri "${KIPRJMOD}/../common/mod/ZX62R-B-5P.pretty")(options "")(descr ""))
 )
