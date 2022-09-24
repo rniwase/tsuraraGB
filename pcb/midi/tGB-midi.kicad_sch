@@ -1329,7 +1329,7 @@
     (property "Reference" "C4" (id 0) (at 245.11 57.1499 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "10μ" (id 1) (at 245.11 59.6899 0)
+    (property "Value" "4.7μ" (id 1) (at 245.11 59.6899 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Capacitor_SMD:C_0402_1005Metric" (id 2) (at 242.2652 62.23 0)
@@ -2271,7 +2271,7 @@
       (reference "C3") (unit 1) (value "0.1μ") (footprint "Capacitor_SMD:C_0402_1005Metric")
     )
     (path "/165b2782-2d75-4312-85a0-80e5d9d4ff9f"
-      (reference "C4") (unit 1) (value "10μ") (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (reference "C4") (unit 1) (value "4.7μ") (footprint "Capacitor_SMD:C_0402_1005Metric")
     )
     (path "/cfbbba51-0adb-4b5c-a79a-58d8e2b466b2"
       (reference "D1") (unit 1) (value "BAT43XV2") (footprint "Diode_SMD:D_SOD-523")
