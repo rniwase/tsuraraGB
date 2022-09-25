@@ -385,6 +385,7 @@
           "/+5V_GB",
           "/3V3VO",
           "/AVCC",
+          "/SHIELD",
           "/VBUS",
           "GND"
         ],
