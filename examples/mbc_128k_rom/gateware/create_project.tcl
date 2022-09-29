@@ -6,13 +6,13 @@ prj_create \
   -synthesis "lse"
 prj_add_source \
   ./rtl/cartridge_top.sv \
-  ../../common/fpga/rtl/bidir_pad.sv \
-  ../../common/fpga/rtl/flash2spram.sv \
-  ../../common/fpga/rtl/SP256K_4x.sv \
-  ../../common/fpga/rtl/led_driver.sv \
-  ../../common/fpga/rtl/pipe_buf.sv \
-  ../../common/fpga/rtl/reset_gen.sv \
-  ../../common/fpga/pin.ldc
+  ../../common/gateware/rtl/bidir_pad.sv \
+  ../../common/gateware/rtl/flash2spram.sv \
+  ../../common/gateware/rtl/SP256K_4x.sv \
+  ../../common/gateware/rtl/led_driver.sv \
+  ../../common/gateware/rtl/pipe_buf.sv \
+  ../../common/gateware/rtl/reset_gen.sv \
+  ../../common/gateware/pin.ldc
 prj_run Synthesis -impl impl_1
 prj_run Map -impl impl_1
 prj_run PAR -impl impl_1
