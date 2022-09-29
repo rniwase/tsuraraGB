@@ -1,6 +1,0 @@
-(sym_lib_table
-  (lib (name "TC74LCXR163245FT")(type "KiCad")(uri "${KIPRJMOD}/sym/TC74LCXR163245FT.kicad_sym")(options "")(descr ""))
-  (lib (name "TPS79901DDCR")(type "KiCad")(uri "${KIPRJMOD}/sym/TPS79901DDCR.kicad_sym")(options "")(descr ""))
-  (lib (name "GB-CardEdge")(type "KiCad")(uri "${KIPRJMOD}/sym/GB-CardEdge.kicad_sym")(options "")(descr ""))
-  (lib (name "HN4A56JU")(type "KiCad")(uri "${KIPRJMOD}/sym/HN4A56JU.kicad_sym")(options "")(descr ""))
-)

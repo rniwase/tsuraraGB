@@ -7333,7 +7333,7 @@
     (uuid 00000000-0000-0000-0000-00006027ac0d)
     (property "Reference" "J2" (id 0) (at 295.91 49.53 0))
     (property "Value" "PROG_PORT" (id 1) (at 295.91 80.01 0))
-    (property "Footprint" "PinHeader:PinHeader-10P-Sidemount" (id 2) (at 295.91 63.5 0)
+    (property "Footprint" "Pin_Sidemount:PinHeader_1x10_P2.54_Sidemount" (id 2) (at 295.91 63.5 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 295.91 63.5 0)
@@ -9007,7 +9007,7 @@
       (reference "J1") (unit 1) (value "GB-CardEdge") (footprint "GB-CardEdge:GB-CardEdge")
     )
     (path "/00000000-0000-0000-0000-00006027ac0d"
-      (reference "J2") (unit 1) (value "PROG_PORT") (footprint "PinHeader:PinHeader-10P-Sidemount")
+      (reference "J2") (unit 1) (value "PROG_PORT") (footprint "Pin_Sidemount:PinHeader_1x10_P2.54_Sidemount")
     )
     (path "/d5f93cc2-b1a6-4187-bb4c-8f284d837e5c"
       (reference "Q1") (unit 1) (value "DMG3415U") (footprint "Package_TO_SOT_SMD:SOT-23")
