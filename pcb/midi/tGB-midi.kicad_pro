@@ -379,7 +379,6 @@
         "microvia_drill": 0.1,
         "name": "Bold",
         "nets": [
-          "+3.3V",
           "+5V",
           "GND"
         ],

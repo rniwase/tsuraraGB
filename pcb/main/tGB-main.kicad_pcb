@@ -6,7 +6,7 @@
 
   (paper "A4")
   (title_block
-    (title "tsuraraGB main board")
+    (title "tsuraraGB Main PCB")
     (rev "B")
   )
 
