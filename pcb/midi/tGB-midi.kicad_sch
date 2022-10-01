@@ -4,6 +4,11 @@
 
   (paper "A4")
 
+  (title_block
+    (title "tsuraraGB MIDI Adapter PCB")
+    (rev "A")
+  )
+
   (lib_symbols
     (symbol "Connector:AudioJack3" (in_bom yes) (on_board yes)
       (property "Reference" "J" (id 0) (at 0 8.89 0)

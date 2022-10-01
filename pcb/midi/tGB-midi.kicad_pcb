@@ -5,6 +5,11 @@
   )
 
   (paper "A4")
+  (title_block
+    (title "tsuraraGB MIDI Adapter PCB")
+    (rev "A")
+  )
+
   (layers
     (0 "F.Cu" signal)
     (31 "B.Cu" signal)
@@ -1271,6 +1276,9 @@
   )
   (gr_text "5V" (at 61.17 95.8) (layer "F.SilkS") (tstamp e754539f-51af-4a2a-8819-8184a4cf077b)
     (effects (font (size 0.6 0.6) (thickness 0.12)))
+  )
+  (gr_text "PCB thickness: 0.8mm" (at 87.7 102.5) (layer "Dwgs.User") (tstamp 43caac44-007d-4842-aa26-79e58d8ecfa6)
+    (effects (font (size 0.6 0.6) (thickness 0.12)) (justify left))
   )
   (dimension (type aligned) (layer "Dwgs.User") (tstamp 302f5ec4-eb37-43de-9659-496a8f9038ae)
     (pts (xy 60 100) (xy 85.2 100))
