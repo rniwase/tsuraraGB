@@ -25,76 +25,42 @@ module cartridge_top (
   output logic        vin
 );
 
-  logic reset_n;
-  reset_gen reset_gen_i (
-    .clk         (clk_20M),
-    .reset_n_out (reset_n)
-  );
+  logic        reset_n;
+  logic        load_done;
 
-  logic [ 7:0] bus_D_in;
-  logic [ 7:0] bus_D_out;
-  logic [ 7:0] bus_D_oe;
+  logic        spi_enable;
+  logic        spi_idle;
+  logic [ 7:0] spi_tx_len;
+  logic        spi_tx_fetch;
+  logic [ 7:0] spi_tx_data;
+  logic [23:0] spi_rx_len;
+  logic        spi_rx_store;
+  logic [ 7:0] spi_rx_data;
 
-  bidir_pad bidir_pad_i (
-    .clk    (clk_20M  ),
-    .d_in   (bus_D_out),
-    .d_out  (bus_D_in ),
-    .oe     (bus_D_oe ),
-    .pad    (bus_D    )
-  );
+  logic [16:0] loader_addr;
+  logic [ 7:0] loader_wd;
+  logic        loader_we;
 
-  logic load_done;
-  logic [15:0] loader_addr;
-  logic loader_we;
-  logic loader_cs;
-  logic [15:0] loader_d_write;
-
-  flash2spram #(
-    .SPI_LOAD_OFFSET  (24'h080000    ),
-    .SPI_LOAD_SIZE    (24'h020000    )   // 128kB
-  ) flash2spram_i (
-    .clk              (clk_20M       ),
-    .reset_n          (reset_n       ),
-    .load_done        (load_done     ),
-    .spram_addr       (loader_addr   ),
-    .spram_we         (loader_we     ),
-    .spram_cs         (loader_cs     ),
-    .spram_d_write    (loader_d_write),
-    .spi_ss           (SPI_ss        ),
-    .spi_so           (SPI_so        ),
-    .spi_si           (SPI_si        ),
-    .spi_sck          (SPI_sck       )
-  );
+  logic [16:0] cart_addr;
+  logic [ 7:0] cart_rd;
 
   logic [15:0] bus_A_s;
-  pipe_buf #(
-    .WIDTH     (     16),
-    .NUM_STAGE (      4)
-  ) sync_bus_A (
-    .clk       (clk_20M),
-    .din       (bus_A  ),
-    .dout      (bus_A_s)
-  );
-
+  logic [ 7:0] bus_D_in;
+  logic [ 7:0] bus_D_in_s;
+  logic [ 7:0] bus_D_out;
+  logic [ 7:0] bus_D_oe;
   logic [20:0] bus_nWR_buf;
-  always_ff @(posedge clk_20M)
-    bus_nWR_buf <= {bus_nWR_buf[19:0], bus_nWR};
+  logic        wr_posedge;
+  logic [ 2:0] rom_bank;
 
-  logic wr_posedge;
-  always_ff @(posedge clk_20M)
-    wr_posedge <= ~bus_nWR_buf[3] & bus_nWR_buf[2];
+  assign cart_addr = {(bus_A_s[15:14] == 2'b00) ? 3'd0 : rom_bank, bus_A_s[13:0]};
+  assign bus_D_dir = bus_nRD | bus_A[15];  // L: read (cartridge -> GB), H: write (GB -> cartridge)
+  assign bus_D_oe = {8{~bus_D_dir}};
 
-  logic [7:0] bus_D_in_s;
-  pipe_buf #(
-    .WIDTH     (         8),
-    .NUM_STAGE (         4)
-  ) sync_bus_D_in (
-    .clk       (clk_20M   ),
-    .din       (bus_D_in  ),
-    .dout      (bus_D_in_s)
-  );
+  assign IO0 = 1'bx;
+  assign IO1 = 1'bx;
+  assign vin = 1'bx;
 
-  logic [2:0] rom_bank;
   always_ff @(posedge clk_20M) begin
     if (~reset_n)
       rom_bank <= 3'd1;
@@ -103,6 +69,59 @@ module cartridge_top (
     else
       rom_bank <= rom_bank;
   end
+
+  always_ff @(posedge clk_20M) begin
+    cpu_reset <= ~load_done;
+    bus_nWR_buf <= {bus_nWR_buf[19:0], bus_nWR};
+    wr_posedge <= ~bus_nWR_buf[3] & bus_nWR_buf[2];
+    bus_D_out <= cart_rd;
+  end
+
+  reset_gen reset_gen_inst (
+    .clk         (clk_20M),
+    .reset_n_out (reset_n)
+  );
+
+  spi_master #(
+    .DIV_RATE   (8'd0        ),
+    .INPUT_SYNC (4'd5        )
+  ) spi_master_inst (
+    .clk        (clk_20M     ),
+    .reset_n    (reset_n     ),
+    .enable     (spi_enable  ),
+    .idle       (spi_idle    ),
+    .tx_len     (spi_tx_len  ),
+    .tx_fetch   (spi_tx_fetch),
+    .tx_data    (spi_tx_data ),
+    .rx_len     (spi_rx_len  ),
+    .rx_store   (spi_rx_store),
+    .rx_data    (spi_rx_data ),
+    .spi_ss     (SPI_ss      ),
+    .spi_so     (SPI_so      ),
+    .spi_si     (SPI_si      ),
+    .spi_sck    (SPI_sck     )
+  );
+
+  flash2spram #(
+    .LOAD_OFFSET  (24'h080000  ),  // in bytes
+    .LOAD_SIZE    (24'h020000  ),  // in bytes
+    .RESET_TIME   (10'd700     )
+  ) flash2spram_inst (
+    .clk          (clk_20M     ),
+    .reset_n      (reset_n     ),
+    .load_done    (load_done   ),
+    .spram_addr   (loader_addr ),
+    .spram_we     (loader_we   ),
+    .spram_wd     (loader_wd   ),
+    .spi_enable   (spi_enable  ),
+    .spi_idle     (spi_idle    ),
+    .spi_tx_len   (spi_tx_len  ),
+    .spi_tx_fetch (spi_tx_fetch),
+    .spi_tx_data  (spi_tx_data ),
+    .spi_rx_len   (spi_rx_len  ),
+    .spi_rx_store (spi_rx_store),
+    .spi_rx_data  (spi_rx_data )
+  );
 
   /*
   bus : 0000 - 3FFF -> cart : 00000 - 01FFF
@@ -114,46 +133,48 @@ module cartridge_top (
                        ...
                        cart : 3E000 - 3FFFF (bank 31)
   */
-  logic [15:0] spram_dout;
-  logic [15:0] cart_addr;
-  logic [15:0] spram_addr;
-  assign spram_addr = load_done ? cart_addr : loader_addr;
-  assign cart_addr = {(bus_A_s[15:14] == 2'b00) ? 3'd0 :
-                      rom_bank, bus_A_s[13:1]};
 
-  SP256K_4x SP256K_4x_i (
-    .CK       (clk_20M              ),
-    .AD       (spram_addr           ),
-    .DI       (loader_d_write       ),
-    .MASKWE   (                 4'hF),
-    .WE       (loader_we            ),
-    .CS       (load_done | loader_cs),
-    .STDBY    (                 1'b0),
-    .SLEEP    (                 1'b0),
-    .PWROFF_N (                 1'b1),
-    .DO       (spram_dout           )
+  SP256K_4x SP256K_4x_inst (
+    .clk        (clk_20M                            ),
+    .addr       (load_done ? cart_addr : loader_addr),
+    .din        (loader_wd                          ),
+    .dout       (cart_rd                            ),
+    .wren       (loader_we                          ),
+    .cs         (1'b1                               ),
+    .standby    (1'b0                               ),
+    .sleep      (1'b0                               ),
+    .poweroff_n (1'b1                               )
   );
 
-  always_ff @(posedge clk_20M)
-    cpu_reset <= ~load_done;
+  bidir_pad bus_D_pad (
+    .clk       (clk_20M   ),
+    .d_in      (bus_D_out ),
+    .d_out     (bus_D_in  ),
+    .oe        (bus_D_oe  ),
+    .pad       (bus_D     )
+  );
 
-  // L: read (cartridge -> GB), H: write (GB -> cartridge)
-  assign bus_D_dir = bus_nRD | bus_A[15];
+  pipe_buf #(
+    .WIDTH     (        16),
+    .NUM_STAGE (         4)
+  ) sync_bus_A (
+    .clk       (clk_20M   ),
+    .din       (bus_A     ),
+    .dout      (bus_A_s   )
+  );
 
-  logic [7:0] bus_D_out_buf;
-  always_ff @(posedge clk_20M)
-    bus_D_out_buf <= bus_A_s[0] ? spram_dout[15:8] : spram_dout[7:0];
+  pipe_buf #(
+    .WIDTH     (         8),
+    .NUM_STAGE (         4)
+  ) sync_bus_D_in (
+    .clk       (clk_20M   ),
+    .din       (bus_D_in  ),
+    .dout      (bus_D_in_s)
+  );
 
-  assign bus_D_out = bus_D_out_buf;
-  assign bus_D_oe = {8{~(bus_nRD | bus_A[15])}};
-
-  led_driver led_driver_i (
+  led_driver led_driver_inst (
     .din (rom_bank[2:0]),
     .pad (LED          )
   );
-
-  assign IO0 = 1'bx;
-  assign IO1 = 1'bx;
-  assign vin = 1'bx;
 
 endmodule

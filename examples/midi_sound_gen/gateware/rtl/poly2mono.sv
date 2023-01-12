@@ -1,3 +1,5 @@
+`include "build_option.sv"
+
 module poly2mono #(
   parameter MAX_VOICE = 16
 )(
@@ -128,6 +130,7 @@ module poly2mono #(
       search_din <= {1'b1, pcount, 7'b0, 7'b0};
   end
 
+`ifdef USE_RADIANT
   always_ff @(posedge clk) begin
     if (state == S_SEARCH_SAME_NOTE)
       search_mask <= t_mask'(M_ACTIVE | M_NOTENUM);
@@ -138,6 +141,18 @@ module poly2mono #(
     else if (state == S_SEARCH_PRIORITY)
       search_mask <= t_mask'(M_ACTIVE | M_PRIORITY);
   end
+`else
+  always_ff @(posedge clk) begin
+    if (state == S_SEARCH_SAME_NOTE)
+      search_mask <= M_ACTIVE | M_NOTENUM;
+    else if (state == S_SEARCH_NONACTIVE)
+      search_mask <= M_ACTIVE;
+    else if (state == S_SEARCH_LAST_VOICED)
+      search_mask <= M_ACTIVE | M_PRIORITY;
+    else if (state == S_SEARCH_PRIORITY)
+      search_mask <= M_ACTIVE | M_PRIORITY;
+  end
+`endif
 
   always_ff @(posedge clk) begin
     if (state == S_SEARCH_SAME_NOTE)
@@ -184,6 +199,7 @@ module poly2mono #(
       w_din <= {1'b0, pcount - 4'd1, 7'b0, 7'b0};
   end
 
+`ifdef USE_RADIANT
   always_ff @(posedge clk) begin
     if (state == S_UPDATE_VELOCITY)
       w_mask <= M_VELOCITY;
@@ -194,6 +210,18 @@ module poly2mono #(
     else if (state == S_UPDATE_PRIORITY)
       w_mask <= M_PRIORITY;
   end
+`else
+  always_ff @(posedge clk) begin
+    if (state == S_UPDATE_VELOCITY)
+      w_mask <= M_VELOCITY;
+    else if (state == S_UPDATE_LIST)
+      w_mask <= M_ACTIVE | M_PRIORITY | M_NOTENUM | M_VELOCITY;
+    else if (state == S_CLEAR_ACTIVE)
+      w_mask <= M_ACTIVE;
+    else if (state == S_UPDATE_PRIORITY)
+      w_mask <= M_PRIORITY;
+  end
+`endif
 
   always_ff @(posedge clk) begin
     if (state == S_UPDATE_VELOCITY)
