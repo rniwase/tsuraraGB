@@ -1,0 +1,53 @@
+## tsuraraGB Pin constriants
+# Cartridge Address bus
+set_io bus_A[0] 12
+set_io bus_A[1] 13
+set_io bus_A[2] 18
+set_io bus_A[3] 19
+set_io bus_A[4] 20
+set_io bus_A[5] 21
+set_io bus_A[6] 23
+set_io bus_A[7] 25
+set_io bus_A[8] 26
+set_io bus_A[9] 27
+set_io bus_A[10] 28
+set_io bus_A[11] 31
+set_io bus_A[12] 32
+set_io bus_A[13] 34
+set_io bus_A[14] 35
+set_io bus_A[15] 36
+
+# Cartridge Data bus
+set_io bus_D[0] 37
+set_io bus_D[1] 38
+set_io bus_D[2] 42
+set_io bus_D[3] 43
+set_io bus_D[4] 45
+set_io bus_D[5] 46
+set_io bus_D[6] 47
+set_io bus_D[7] 48
+set_io bus_D_dir 2
+
+# Cartridge others
+set_io bus_nRD 11
+set_io bus_nWR 10
+set_io cpu_reset 3
+set_io vin 4
+
+# User LED
+set_io LED[0] 39
+set_io LED[1] 40
+set_io LED[2] 41
+
+# User IO
+set_io IO0 9
+set_io IO1 6
+
+# SPI
+set_io SPI_sck 15
+set_io SPI_ss 16
+set_io SPI_so 14
+set_io SPI_si 17
+
+# Clock input
+set_io clk_20M 44

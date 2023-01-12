@@ -25,7 +25,7 @@ module ptcam #(
 
   integer i;
 
-  logic [MEMSIZE-1:0][DWIDTH-1:0] mem;
+  logic [DWIDTH-1:0] mem [0:MEMSIZE-1];
 
   always_ff @(posedge clk) begin
     if (~reset_n) begin

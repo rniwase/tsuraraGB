@@ -1,3 +1,5 @@
+`include "build_option.sv"
+
 module bidir_pad #(
   parameter WIDTH = 8
 )(
@@ -8,13 +10,16 @@ module bidir_pad #(
   inout  logic [WIDTH-1:0] pad
 );
 
+`ifdef USE_RADIANT
   logic [WIDTH-1:0] oe2pad;
   logic [WIDTH-1:0] or2pad;
   logic [WIDTH-1:0] pad2ir;
+`endif
 
   genvar i;
   generate
     for(i = 0; i < WIDTH; i = i + 1) begin: gen_pad_primitive
+`ifdef USE_RADIANT
       IOL_B u_IOL_B (
         .PADDI   (pad2ir[i]), // I, from pad to input register input
         .DO1     (     1'b0), // I
@@ -35,6 +40,25 @@ module bidir_pad #(
         .O       (pad2ir[i]), // O, from pad to input register input
         .B       (   pad[i])  // IO, bidirectional pad
       );
+`else
+      SB_IO #(
+        .PIN_TYPE          (  6'b100000),
+        .PULLUP            (       1'b0),
+        .NEG_TRIGGER       (       1'b0),
+        .IO_STANDARD       ("SB_LVCMOS")
+      ) SB_IO_i (
+        .PACKAGE_PIN       (  pad[i]),
+        .LATCH_INPUT_VALUE (    1'b0),
+        .CLOCK_ENABLE      (    1'b1),
+        .INPUT_CLK         (     clk),
+        .OUTPUT_CLK        (     clk),
+        .OUTPUT_ENABLE     (   oe[i]),
+        .D_OUT_0           ( d_in[i]),
+        .D_OUT_1           ( d_in[i]),
+        .D_IN_0            (d_out[i]),
+        .D_IN_1            (        )
+      );
+`endif
     end
   endgenerate
 endmodule

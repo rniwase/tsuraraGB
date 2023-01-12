@@ -1,3 +1,5 @@
+`include "build_option.sv"
+
 module midi_perser (
   input  logic        clk,
   input  logic        reset_n,
@@ -66,6 +68,7 @@ module midi_perser (
       data_valid_p <= {data_valid_p[1:0], data_valid};
   end
 
+`ifdef USE_RADIANT
   always_ff @(posedge clk) begin
     if (~reset_n)
       voice_state <= V_NOTE_OFF;
@@ -73,6 +76,15 @@ module midi_perser (
       voice_state <= t_voice'(d_in_str[6:4]);
     end
   end
+`else
+  always_ff @(posedge clk) begin
+    if (~reset_n)
+      voice_state <= V_NOTE_OFF;
+    else if (data_valid_p[0] & is_status_byte) begin
+      voice_state <= d_in_str[6:4];
+    end
+  end
+`endif
 
   always_ff @(posedge clk) begin
     case (voice_state)

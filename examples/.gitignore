@@ -9,8 +9,13 @@
 *.dir/
 impl_1/
 
+# For yosys/nexpnr generated files
+*.json
+*.asc
+*.bin
+*.rpt
+
 # For GBDK generated files
 *.gb
 *.map
 *.noi
-
