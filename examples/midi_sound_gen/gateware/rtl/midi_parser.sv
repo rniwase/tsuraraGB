@@ -34,11 +34,11 @@ module midi_perser (
   } t_voice;
 
   t_voice voice_state;
+
   logic [1:0] voice_len, voice_len_max;
-
   logic [7:0] d_in_str;
-
   logic data_valid, is_data_byte, is_status_byte;
+  
   assign data_valid = ~f_error & d_valid;
   assign is_data_byte = ~d_in_str[7];
   assign is_status_byte = d_in_str[7] & ~&d_in_str[6:4];  // 8Xh - EXh

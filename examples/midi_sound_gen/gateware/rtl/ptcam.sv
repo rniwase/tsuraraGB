@@ -26,6 +26,14 @@ module ptcam #(
   integer i;
 
   logic [DWIDTH-1:0] mem [0:MEMSIZE-1];
+  logic [DWIDTH-1:0] search_din_str;
+  logic [DWIDTH-1:0] search_mask_str;
+  logic [$clog2(MEMSIZE)-1:0] search_addr;
+  logic search_busy;
+  logic search_match, end_of_search;
+
+  assign search_match = (mem[search_addr] & search_mask_str) == (search_din_str & search_mask_str);
+  assign end_of_search = search_addr == MEMSIZE-1;
 
   always_ff @(posedge clk) begin
     if (~reset_n) begin
@@ -38,15 +46,6 @@ module ptcam #(
 
   always_ff @(posedge clk)
     r_dout <= mem[r_addr];
-
-  logic [DWIDTH-1:0] search_din_str;
-  logic [DWIDTH-1:0] search_mask_str;
-  logic [$clog2(MEMSIZE)-1:0] search_addr;
-  logic search_busy;
-
-  logic search_match, end_of_search;
-  assign search_match = (mem[search_addr] & search_mask_str) == (search_din_str & search_mask_str);
-  assign end_of_search = search_addr == MEMSIZE-1;
 
   always_ff @(posedge clk) begin
     if (~search_busy & search_en) begin
