@@ -1,8 +1,8 @@
 CC = lcc
 CFLAGS = -Wa-l -Wl-m -Wl-j -Wl-yo8
 
-build: rom_bank_switch.c
-	$(CC) $(CFLAGS) -o rom_bank_switch.gb $<
+build: mbc_128k_rom.c
+	$(CC) $(CFLAGS) -o mbc_128k_rom.gb $<
 
 .PHONY: clean
 clean:
