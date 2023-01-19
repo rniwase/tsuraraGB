@@ -16,18 +16,21 @@ module uart_rx #(
   localparam BAUDGEN_PERIOD_HALF = BAUDGEN_PERIOD / 2;
 
   logic [NUM_SYNC_STAGE-1:0] rx_buf;
-  always_ff @(posedge clk)
-    rx_buf <= {rx_buf[NUM_SYNC_STAGE-2:0], rx_in};
-
-  logic rx_sync;
-  assign rx_sync = rx_buf[NUM_SYNC_STAGE-1];
-
-  logic baudgen_valid;
+  logic        rx_sync;
+  logic        baudgen_valid;
   logic [15:0] baudgen_t_count;
   logic [ 4:0] baudgen_b_count;
-  logic baudgen_t_match, endofrx;
+  logic        baudgen_t_match, endofrx;
+  logic        sample_tmg;
+  logic [ 8:0] d_shiftreg;  // 8(data) + 1(stop bit)
+
+  assign rx_sync = rx_buf[NUM_SYNC_STAGE-1];
   assign baudgen_t_match = baudgen_t_count == BAUDGEN_PERIOD_HALF-1;
   assign endofrx = baudgen_valid & baudgen_b_count == 5'd19;
+  assign sample_tmg = baudgen_t_match & ~baudgen_b_count[0];
+
+  always_ff @(posedge clk)
+    rx_buf <= {rx_buf[NUM_SYNC_STAGE-2:0], rx_in};
 
   always_ff @(posedge clk) begin
     if (~reset_n)
@@ -62,10 +65,6 @@ module uart_rx #(
       baudgen_b_count <= 5'd0;
   end
 
-  logic sample_tmg;
-  assign sample_tmg = baudgen_t_match & ~baudgen_b_count[0];
-
-  logic [8:0] d_shiftreg;  // 8(data) + 1(stop bit)
   always_ff @(posedge clk) begin
     if (sample_tmg)
       d_shiftreg <= {rx_sync, d_shiftreg[8:1]};

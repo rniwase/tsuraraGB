@@ -8,8 +8,15 @@ module midi_rx (
   output logic [6:0] cc_volume_out
 );
 
-  logic rx_valid, rx_f_error;
+  logic       rx_valid, rx_f_error;
   logic [7:0] rx_data;
+  logic       v_valid, v_note_off, v_note_on;
+  logic [3:0] v_channel;
+  logic [6:0] v_note_num;
+  logic [6:0] v_note_velocity;
+  logic       v_parameter;
+  logic [6:0] v_parameter_num;
+  logic [6:0] v_parameter_value;
 
   uart_rx #(
     .NUM_SYNC_STAGE(5),
@@ -23,15 +30,7 @@ module midi_rx (
     .f_error (rx_f_error)
   );
 
-  logic v_valid, v_note_off, v_note_on;
-  logic [3:0] v_channel;
-  logic [6:0] v_note_num;
-  logic [6:0] v_note_velocity;
-  logic v_parameter;
-  logic [6:0] v_parameter_num;
-  logic [6:0] v_parameter_value;
-
-  midi_perser midi_perser_i (
+  midi_perser midi_perser_inst (
     .clk              (clk              ),
     .reset_n          (reset_n          ),
     .d_in             (rx_data          ),
@@ -48,7 +47,7 @@ module midi_rx (
     .v_parameter_value(v_parameter_value)
   );
 
-  poly2mono poly2mono_i (
+  poly2mono poly2mono_inst (
     .clk          (clk                               ),
     .reset_n      (reset_n                           ),
     .ready        (                                  ),
