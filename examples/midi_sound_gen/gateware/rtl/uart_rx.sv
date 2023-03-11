@@ -1,9 +1,9 @@
-/* UART receiver, num of stop bit: 1, no parity bit */
+/* uart_rx.sv - UART receiver, Num. of stop bit: 1, No parity bit */
 
 module uart_rx #(
   parameter NUM_SYNC_STAGE = 5,    // Number of input synchronizer stages (>=2)
   parameter BAUDGEN_PERIOD = 640   // System clock frequency / UART Baud rate
-                                   // (e.g.) 50[MHz] / 31.25[kbps] = 1600
+                                   // (e.g.) 20[MHz] / 31.25[kbps] = 640
 )(
   input  logic       clk,      // System clock input
   input  logic       reset_n,  // Reset input
@@ -16,13 +16,13 @@ module uart_rx #(
   localparam BAUDGEN_PERIOD_HALF = BAUDGEN_PERIOD / 2;
 
   logic [NUM_SYNC_STAGE-1:0] rx_buf;
-  logic        rx_sync;
-  logic        baudgen_valid;
-  logic [15:0] baudgen_t_count;
-  logic [ 4:0] baudgen_b_count;
-  logic        baudgen_t_match, endofrx;
-  logic        sample_tmg;
-  logic [ 8:0] d_shiftreg;  // 8(data) + 1(stop bit)
+  logic                      rx_sync;
+  logic                      baudgen_valid;
+  logic [              15:0] baudgen_t_count;
+  logic [               4:0] baudgen_b_count;
+  logic                      baudgen_t_match, endofrx;
+  logic                      sample_tmg;
+  logic [               8:0] d_shiftreg;  // 8(data) + 1(stop bit)
 
   assign rx_sync = rx_buf[NUM_SYNC_STAGE-1];
   assign baudgen_t_match = baudgen_t_count == BAUDGEN_PERIOD_HALF-1;
@@ -44,50 +44,34 @@ module uart_rx #(
   end
 
   always_ff @(posedge clk) begin
-    if (baudgen_valid) begin
-      if (baudgen_t_match)
-        baudgen_t_count <= 16'd0;
-      else
-        baudgen_t_count <= baudgen_t_count + 16'd1;
-    end
-    else
+    if (~baudgen_valid)
       baudgen_t_count <= 16'd0;
+    else
+      baudgen_t_count <= baudgen_t_match ? 16'd0 : baudgen_t_count + 16'd1;
   end
 
   always_ff @(posedge clk) begin
-    if (baudgen_valid) begin
-      if (baudgen_t_match)
-        baudgen_b_count <= baudgen_b_count + 5'd1;
-      else
-        baudgen_b_count <= baudgen_b_count;
-    end
-    else
+    if (~baudgen_valid)
       baudgen_b_count <= 5'd0;
+    else
+      baudgen_b_count <= baudgen_t_match ? baudgen_b_count + 5'd1 : baudgen_b_count;
   end
 
-  always_ff @(posedge clk) begin
-    if (sample_tmg)
-      d_shiftreg <= {rx_sync, d_shiftreg[8:1]};
-    else
-      d_shiftreg <= d_shiftreg;
-  end
+  always_ff @(posedge clk)
+    d_shiftreg <= sample_tmg ? {rx_sync, d_shiftreg[8:1]} : d_shiftreg;
 
   always_ff @(posedge clk) begin
     if (~reset_n)
       d_out <= 8'd0;
-    else if (endofrx)
-      d_out <= d_shiftreg[7:0];
     else
-      d_out <= d_out;
+      d_out <= endofrx ? d_shiftreg[7:0] : d_out;
   end
 
   always_ff @(posedge clk) begin
     if (~reset_n)
-      f_error <= 1'd0;
-    else if (endofrx)
-      f_error <= ~d_shiftreg[8];
+      f_error <= 1'b0;
     else
-      f_error <= f_error;
+      f_error <= endofrx ? ~d_shiftreg[8] : f_error;
   end
 
   always_ff @(posedge clk)

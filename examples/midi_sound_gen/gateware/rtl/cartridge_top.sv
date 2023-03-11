@@ -1,3 +1,5 @@
+/* cartridge_top.sv - Top module for tsuraraGB */
+
 module cartridge_top (
   /* Clock input */
   input  logic        clk_20M,
@@ -20,8 +22,8 @@ module cartridge_top (
   output logic [ 2:0] LED,
 
   /* User I/O for MIDI */
-  output logic        IO0,  // MIDI thru output
-  input  logic        IO1,  // MIDI input
+  output logic        IO0,  // Assign to MIDI thru output
+  input  logic        IO1,  // Assign to MIDI input
 
   /* unused */
   output logic        vin
@@ -55,9 +57,9 @@ module cartridge_top (
   logic        wr_posedge;
   logic [ 2:0] rom_bank;
 
-  logic        midi_note_on;
+  logic        midi_note_act;
   logic [ 6:0] midi_note_num;
-  logic [ 6:0] midi_velocity;
+  logic [ 6:0] midi_note_vel;
   logic [ 6:0] midi_cc_volume;
 
   assign cart_addr = {(bus_A_s[15:14] == 2'b00) ? 3'd0 : rom_bank, bus_A_s[13:0]};
@@ -85,11 +87,11 @@ module cartridge_top (
   always_ff @(posedge clk_20M) begin
     case (bus_A_s)
       16'hB000:
-        bus_D_out <= {7'b0, midi_note_on};
+        bus_D_out <= {7'b0, midi_note_act};
       16'hB001:
         bus_D_out <= {1'b0, midi_note_num};
       16'hB002:
-        bus_D_out <= {1'b0, midi_velocity};
+        bus_D_out <= {1'b0, midi_note_vel};
       16'hB003:
         bus_D_out <= {1'b0, midi_cc_volume};
       default:
@@ -143,17 +145,6 @@ module cartridge_top (
     .spi_rx_data  (spi_rx_data )
   );
 
-  /*
-  bus : 0000 - 3FFF -> cart : 00000 - 01FFF
-  bus : 4000 - 7FFF -> cart : 02000 - 03FFF (bank 0, 1)
-                       cart : 04000 - 05FFF (bank 2)
-                       cart : 06000 - 07FFF (bank 3)
-                       cart : 08000 - 09FFF (bank 4)
-                       cart : 0A000 - 0BFFF (bank 5)
-                       ...
-                       cart : 3E000 - 3FFFF (bank 31)
-  */
-
   SP256K_4x SP256K_4x_inst (
     .clk        (clk_20M                            ),
     .addr       (load_done ? cart_addr : loader_addr),
@@ -196,14 +187,18 @@ module cartridge_top (
     .clk          (clk_20M       ),
     .reset_n      (reset_n       ),
     .midi_in      (IO1           ),
-    .note_on_out  (midi_note_on  ),
+    .note_act_out (midi_note_act ),
     .note_num_out (midi_note_num ),
-    .velocity_out (midi_velocity ),
+    .note_vel_out (midi_note_vel ),
     .cc_volume_out(midi_cc_volume)
   );
 
   led_driver led_driver_inst (
-    .din ({midi_note_on, midi_velocity >= 64, midi_note_num >= 64}),
+    .din ({
+      midi_note_act,
+      midi_note_vel >= 7'd64,
+      midi_note_num >= 7'd64
+    }),
     .pad (LED)
   );
 

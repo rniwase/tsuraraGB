@@ -12,12 +12,12 @@ module reset_gen #(
   assign count_match = (count == ASSERT_LEN);
 
   initial begin
-    count <= 0;
+    count <= CNT_WIDTH'(0);
     reset_n_out <= 1'b0;
   end
 
   always_ff @(posedge clk) begin
-    count <= count_match ? count : count + 1;
+    count <= count_match ? count : count + CNT_WIDTH'(1);
     reset_n_out <= count_match;
   end
 

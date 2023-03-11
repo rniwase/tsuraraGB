@@ -40,7 +40,7 @@ module flash2spram #(
   logic [ 9:0] wait_count;
   logic [ 1:0] tx_count;
   logic [23:0] rx_count;
-  logic [25:0] spram_addr_pre;
+  logic [24:0] spram_addr_pre;
   logic        spi_idle_buf;
   logic        spi_idle_rise;
   logic        spi_idle_rise_buf;
