@@ -19,7 +19,3 @@ impl_1/
 *.gb
 *.map
 *.noi
-
-# For generated build option header
-build_option.sv
-
