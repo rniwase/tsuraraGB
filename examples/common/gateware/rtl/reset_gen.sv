@@ -1,3 +1,5 @@
+/* reset_gen.sv - Reset signal generator */
+
 module reset_gen #(
   parameter ASSERT_LEN = 63
 )(

@@ -1,3 +1,5 @@
+/* SP256K_4x.sv - Wrapper module for SPRAM primitive, width: 8, depth: 131072 */
+
 module SP256K_4x (
   input  logic        clk,
   input  logic [16:0] addr,

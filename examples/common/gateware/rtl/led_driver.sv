@@ -1,3 +1,5 @@
+/* bidir_pad.sv - Wrapper module for LED driver primitive */
+
 module led_driver (
   input  logic [2:0] din,
   output logic [2:0] pad

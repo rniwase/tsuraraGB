@@ -1,4 +1,5 @@
-## tsuraraGB Pin constriants
+## tsuraraGB Pin constriants (for nextpnr)
+
 # Cartridge Address bus
 set_io bus_A[0] 12
 set_io bus_A[1] 13

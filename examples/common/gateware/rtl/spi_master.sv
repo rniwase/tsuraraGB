@@ -1,3 +1,5 @@
+/* spi_master.sv - Simple SPI master interface */
+
 module spi_master #(
   parameter    [ 7:0] DIV_RATE = 8'd1,
   parameter    [ 3:0] INPUT_SYNC = 4'd5

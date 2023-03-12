@@ -1,3 +1,5 @@
+/* cartridge_top.sv - Top module for tsuraraGB */
+
 module cartridge_top (
   /* Clock input */
   input  logic        clk_20M,
@@ -122,17 +124,6 @@ module cartridge_top (
     .spi_rx_store (spi_rx_store),
     .spi_rx_data  (spi_rx_data )
   );
-
-  /*
-  bus : 0000 - 3FFF -> cart : 00000 - 01FFF
-  bus : 4000 - 7FFF -> cart : 02000 - 03FFF (bank 0, 1)
-                       cart : 04000 - 05FFF (bank 2)
-                       cart : 06000 - 07FFF (bank 3)
-                       cart : 08000 - 09FFF (bank 4)
-                       cart : 0A000 - 0BFFF (bank 5)
-                       ...
-                       cart : 3E000 - 3FFFF (bank 31)
-  */
 
   SP256K_4x SP256K_4x_inst (
     .clk        (clk_20M                            ),

@@ -1,3 +1,5 @@
+/* bidir_pad.sv - Wrapper module for bidirectional pad primitive */
+
 module bidir_pad #(
   parameter WIDTH = 8
 )(

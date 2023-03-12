@@ -63,7 +63,7 @@ module cartridge_top (
   logic [ 6:0] midi_cc_volume;
 
   assign cart_addr = {(bus_A_s[15:14] == 2'b00) ? 3'd0 : rom_bank, bus_A_s[13:0]};
-  assign bus_D_dir = bus_nRD | (bus_A[15] ? ~bus_A[13] : 1'b0);
+  assign bus_D_dir = bus_nRD | (bus_A[15] ? ~bus_A[13] : 1'b0);  // L: read (cartridge -> GB), H: write (GB -> cartridge)
   assign bus_D_oe = {8{~bus_D_dir}};
 
   assign IO0 = IO1;

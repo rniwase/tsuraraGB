@@ -1,3 +1,5 @@
+/* pipe_buf.sv - Simple pipeline buffer */
+
 module pipe_buf #(
   parameter WIDTH = 8,
   parameter NUM_STAGE = 6

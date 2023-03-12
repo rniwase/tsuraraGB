@@ -1,3 +1,5 @@
+/* flash2spram.sv - SPI flash memory to SPRAM loader */
+
 module flash2spram #(
   parameter [23:0] LOAD_OFFSET = 24'h080000,  // in bytes
   parameter [23:0] LOAD_SIZE   = 24'h020000,  // in bytes
