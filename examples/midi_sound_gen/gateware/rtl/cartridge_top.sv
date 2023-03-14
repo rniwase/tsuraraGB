@@ -57,10 +57,8 @@ module cartridge_top (
   logic        wr_posedge;
   logic [ 2:0] rom_bank;
 
-  logic        midi_note_act;
-  logic [ 6:0] midi_note_num;
-  logic [ 6:0] midi_note_vel;
-  logic [ 6:0] midi_cc_volume;
+  logic [ 7:0] bus_D_out_midi;
+  logic [ 3:0] note_act;
 
   assign cart_addr = {(bus_A_s[15:14] == 2'b00) ? 3'd0 : rom_bank, bus_A_s[13:0]};
   assign bus_D_dir = bus_nRD | (bus_A[15] ? ~bus_A[13] : 1'b0);  // L: read (cartridge -> GB), H: write (GB -> cartridge)
@@ -85,18 +83,19 @@ module cartridge_top (
   end
 
   always_ff @(posedge clk_20M) begin
-    case (bus_A_s)
-      16'hB000:
-        bus_D_out <= {7'b0, midi_note_act};
-      16'hB001:
-        bus_D_out <= {1'b0, midi_note_num};
-      16'hB002:
-        bus_D_out <= {1'b0, midi_note_vel};
-      16'hB003:
-        bus_D_out <= {1'b0, midi_cc_volume};
-      default:
-        bus_D_out <= cart_rd;
-    endcase
+    // case (bus_A_s)
+    //   16'hB000:
+    //     bus_D_out <= {7'b0, midi_note_act};
+    //   16'hB001:
+    //     bus_D_out <= {1'b0, midi_note_num};
+    //   16'hB002:
+    //     bus_D_out <= {1'b0, midi_note_vel};
+    //   16'hB003:
+    //     bus_D_out <= {1'b0, midi_cc_volume};
+    //   default:
+    //     bus_D_out <= cart_rd;
+    // endcase
+    bus_D_out <= bus_A_s[15:12] == 4'hB ? bus_D_out_midi : cart_rd;
   end
 
   reset_gen reset_gen_inst (
@@ -187,18 +186,13 @@ module cartridge_top (
     .clk          (clk_20M       ),
     .reset_n      (reset_n       ),
     .midi_in      (IO1           ),
-    .note_act_out (midi_note_act ),
-    .note_num_out (midi_note_num ),
-    .note_vel_out (midi_note_vel ),
-    .cc_volume_out(midi_cc_volume)
+    .bus_A        (bus_A_s[7:0]  ),
+    .bus_D_out    (bus_D_out_midi),
+    .note_act     (note_act      )
   );
 
   led_driver led_driver_inst (
-    .din ({
-      midi_note_act,
-      midi_note_vel >= 7'd64,
-      midi_note_num >= 7'd64
-    }),
+    .din (note_act[2:0]),
     .pad (LED)
   );
 
