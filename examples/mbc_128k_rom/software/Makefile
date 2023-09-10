@@ -1,4 +1,4 @@
-CC = lcc
+CC = /opt/gbdk/bin/lcc
 CFLAGS = -Wa-l -Wl-m -Wl-j -Wl-yo8
 
 build: mbc_128k_rom.c

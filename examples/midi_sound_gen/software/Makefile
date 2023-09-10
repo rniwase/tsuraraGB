@@ -1,4 +1,4 @@
-CC = lcc
+CC = /opt/gbdk/bin/lcc
 CFLAGS = -Wa-l -Wl-m -Wl-j
 
 build:
