@@ -36,7 +36,7 @@ mkdir icestorm
 pushd icestorm
 git init
 git remote add origin https://github.com/YosysHQ/icestorm.git
-git fetch --depth 1 origin d20a5e9001f46262bf0cef220f1a6943946e421d
+git fetch --depth 1 origin 1a40ae75d4eebee9cce73a2c4d634fd42ed0110f
 git reset --hard FETCH_HEAD
 make -j$(nproc)
 sudo make install
@@ -51,7 +51,7 @@ sudo make install
 popd
 
 echo -e "Installing yosys"
-git clone https://github.com/YosysHQ/yosys.git -b yosys-0.33 --depth 1
+git clone https://github.com/YosysHQ/yosys.git -b yosys-0.36 --depth 1
 pushd yosys
 make -j$(nproc)
 sudo make install
