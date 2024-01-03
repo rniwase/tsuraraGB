@@ -1,0 +1,34 @@
+name: check-pcb
+
+on:
+  push:
+    paths:
+      - 'pcb/**'
+  pull_request:
+    paths:
+      - 'pcb/**'
+
+jobs:
+  check-pcb:
+    runs-on: ubuntu-22.04
+    container:
+      image: kicad/kicad:nightly
+    steps:
+      # Checkout repository
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Execute ERC
+      - name: Execute ERC
+        run: | 
+          for sch in $(find pcb/ -name "*.kicad_sch"); do
+            kicad-cli sch erc --exit-code-violations ${sch}
+          done
+
+      # Execute DRC
+      - name: Execute DRC
+        run: | 
+          for pcb in $(find pcb/ -name "*.kicad_pcb"); do
+            kicad-cli pcb drc --exit-code-violations ${pcb}
+          done
+
