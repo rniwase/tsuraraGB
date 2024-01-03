@@ -1,6 +1,12 @@
 name: build-examples
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - 'examples/**'
+  pull_request:
+    paths:
+      - 'examples/**'
 
 jobs:
   build-examples:
