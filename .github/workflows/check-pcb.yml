@@ -4,15 +4,18 @@ on:
   push:
     paths:
       - 'pcb/**'
+      - '.github/workflows/check-pcb.yml'
   pull_request:
     paths:
       - 'pcb/**'
+      - '.github/workflows/check-pcb.yml'
 
 jobs:
   check-pcb:
     runs-on: ubuntu-22.04
     container:
       image: kicad/kicad:nightly
+      options: --user root
     steps:
       # Checkout repository
       - name: Checkout
