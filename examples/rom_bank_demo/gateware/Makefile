@@ -1,4 +1,4 @@
-PROJ = midi_sound_gen
+PROJ = rom_bank_demo
 TOP = cartridge_top
 SRCS = \
 	../../common/gateware/rtl/led_driver.sv \
@@ -8,11 +8,6 @@ SRCS = \
 	../../common/gateware/rtl/SP256K_4x.sv \
 	../../common/gateware/rtl/pipe_buf.sv \
 	../../common/gateware/rtl/reset_gen.sv \
-	./rtl/midi_rx.sv \
-	./rtl/uart_rx.sv \
-	./rtl/midi_parser.sv \
-	./rtl/poly2mono.sv \
-	./rtl/ptcam.sv \
 	./rtl/cartridge_top.sv
 PCF = ../../common/gateware/pin.pcf
 OCSBIN = ../../downloads/oss-cad-suite/bin

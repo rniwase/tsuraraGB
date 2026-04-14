@@ -1,7 +1,7 @@
 /* poly2mono.sv - Converting note messages from polyphony to monophony */
 
 module poly2mono #(
-  parameter MAX_VOICE = 16  // Max. of poly voices to store
+  parameter MAX_VOICE = 8  // Max. of poly voices to store
 )(
   input  logic       clk,
   input  logic       reset_n,
