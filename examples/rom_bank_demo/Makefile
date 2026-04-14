@@ -1,4 +1,4 @@
-PROJ = mbc_128k_rom
+PROJ = rom_bank_demo
 SUBDIRS = gateware software
 PYTHON = ../downloads/oss-cad-suite/py3bin/python3
 TGBFLASH = ../tools/tgbflash.py

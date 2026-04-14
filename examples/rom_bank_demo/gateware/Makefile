@@ -1,4 +1,4 @@
-PROJ = mbc_128k_rom
+PROJ = rom_bank_demo
 TOP = cartridge_top
 SRCS = \
 	../../common/gateware/rtl/led_driver.sv \

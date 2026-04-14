@@ -1,7 +1,7 @@
-PROJ = mbc_128k_rom
+PROJ = rom_bank_demo
 GBDK_HOME = ../../downloads/gbdk
 CC = $(GBDK_HOME)/bin/lcc
-CFLAGS = -Wa-l -Wl-m -Wl-j -Wl-yo8
+CFLAGS = -Wa-l -Wl-m -Wl-j -Wm-yo16 -Wm-ya0
 
 .PHONY: all prepare build clean
 

@@ -1,4 +1,4 @@
-SUBDIRS = mbc_128k_rom midi_sound_gen
+SUBDIRS = rom_bank_demo midi_sound_gen
 OCS_URL = "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2026-04-12/oss-cad-suite-linux-x64-20260412.tgz"
 GBDK_URL = "https://github.com/gbdk-2020/gbdk-2020/releases/download/4.5.0/gbdk-linux64.tar.gz"
 DL_PATH = ./downloads
