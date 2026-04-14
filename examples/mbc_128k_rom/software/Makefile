@@ -1,9 +1,20 @@
-CC = /opt/gbdk/bin/lcc
+PROJ = mbc_128k_rom
+GBDK_HOME = ../../downloads/gbdk
+CC = $(GBDK_HOME)/bin/lcc
 CFLAGS = -Wa-l -Wl-m -Wl-j -Wl-yo8
 
-build: mbc_128k_rom.c
-	$(CC) $(CFLAGS) -o mbc_128k_rom.gb $<
+.PHONY: all prepare build clean
 
-.PHONY: clean
+all: prepare build
+
+prepare:
+	@ cd ../../; \
+	$(MAKE) prepare
+
+build: $(PROJ).gb
+
+%.gb: %.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 clean:
 	rm -f *.map *.gb *.noi

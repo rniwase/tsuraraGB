@@ -1,8 +1,20 @@
-CC = /opt/gbdk/bin/lcc
+PROJ = midi_sound_gen
+GBDK_HOME = ../../downloads/gbdk
+CC = $(GBDK_HOME)/bin/lcc
 CFLAGS = -Wa-l -Wl-m -Wl-j
 
-build:
-	$(CC) $(CFLAGS) -o midi_sound_gen.gb midi_sound_gen.c
+.PHONY: all prepare build clean
+
+all: prepare build
+
+prepare:
+	@ cd ../../; \
+	$(MAKE) prepare
+
+build: $(PROJ).gb
+
+%.gb: %.c
+	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
 	rm -f *.map *.gb *.noi

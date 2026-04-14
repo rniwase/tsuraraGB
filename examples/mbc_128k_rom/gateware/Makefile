@@ -10,52 +10,35 @@ SRCS = \
 	../../common/gateware/rtl/reset_gen.sv \
 	./rtl/cartridge_top.sv
 PCF = ../../common/gateware/pin.pcf
-LDC = ../../common/gateware/pin.ldc
-
-RADIANT_PRIMS = ../../common/gateware/rtl/radiant_prims.sv
-
-RADIANT_TCL = \
-	prj_create \
-		-name "$(PROJ)" \
-		-impl "impl_1" \
-		-dev iCE40UP5K-SG48I \
-		-performance "High-Performance_1.2V" \
-		-synthesis "lse"; \
-	prj_add_source $(RADIANT_PRIMS) $(SRCS) $(LDC); \
-	prj_set_impl_opt -impl impl_1 VerilogStandard \"System Verilog\"; \
-	prj_set_impl_opt -impl impl_1 top cartridge_top; \
-	prj_run Synthesis -impl impl_1; \
-	prj_run Map -impl impl_1; \
-	prj_run PAR -impl impl_1; \
-	prj_run Export -impl impl_1; \
-	prj_save; \
-	prj_close;
+OCSBIN = ../../downloads/oss-cad-suite/bin
+YOSYS = $(OCSBIN)/yosys
+NEXTPNR = $(OCSBIN)/nextpnr-ice40
+ICEPACK = $(OCSBIN)/icepack
+ICETIME = $(OCSBIN)/icetime
 
 .SUFFIXES: .json .asc .bin .rpt
 
-ifeq ($(USE_RADIANT),1)
-all:
-	echo "$(RADIANT_TCL)" | radiantc
-else
-all: $(PROJ).bin $(PROJ).rpt
-endif
+.PHONY: all prepare build clean
+
+all: prepare build
+
+prepare:
+	@ cd ../../; \
+	$(MAKE) prepare
+
+build: $(PROJ).bin $(PROJ).rpt
 
 $(PROJ).json: $(SRCS)
-	yosys -p 'synth_ice40 -top $(TOP) -json $@' $^
+	$(YOSYS) -p 'synth_ice40 -top $(TOP) -json $@' $^
 
 .json.asc:
-	nextpnr-ice40 --up5k --package sg48 --asc $@ --pcf $(PCF) --json $<
+	$(NEXTPNR) --up5k --package sg48 --asc $@ --pcf $(PCF) --json $<
 
 .asc.bin:
-	icepack $< $@
+	$(ICEPACK) $< $@
 
 .asc.rpt:
-	icetime -d up5k -mtr $@ $<
+	$(ICETIME) -d up5k -mtr $@ $<
 
-.PHONY: clean
 clean:
-ifeq ($(USE_RADIANT),1)
-	rm -rf *.rdf *.sty .*.ini *.xml *.html *.log .recovery *.dir/ impl_1/
-else
-	rm *.bin *.json *.rpt
-endif
+	rm -f *.bin *.json *.rpt

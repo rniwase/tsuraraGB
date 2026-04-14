@@ -1,6 +1,16 @@
+PROJ = midi_sound_gen
 SUBDIRS = gateware software
+PYTHON = ../downloads/oss-cad-suite/py3bin/python3
+TGBFLASH = ../tools/tgbflash.py
 
-.PHONY: build
+.PHONY: all prepare build clean flash
+
+all: build
+
+prepare:
+	@ cd ../; \
+	$(MAKE) prepare
+
 build:
 	@ for d in $(SUBDIRS); do \
 		cd $$d; \
@@ -8,7 +18,6 @@ build:
 		cd ..; \
 	done
 
-.PHONY: clean
 clean:
 	@ for d in $(SUBDIRS); do \
 		cd $$d; \
@@ -16,16 +25,8 @@ clean:
 		cd ..; \
 	done
 
-.PHONY: prog
-prog:
-ifeq ($(USE_RADIANT),1)
-	python3 ../../programmer/tgb-prog.py \
-	--file ./gateware/impl_1/midi_sound_gen_impl_1.bin ./software/midi_sound_gen.gb \
+flash: prepare
+	$(PYTHON) $(TGBFLASH) \
+	--file ./gateware/$(PROJ).bin ./software/$(PROJ).gb \
 	--offset 0x000000 0x080000 \
 	--erase --verify
-else
-	python3 ../../programmer/tgb-prog.py \
-	--file ./gateware/midi_sound_gen.bin ./software/midi_sound_gen.gb \
-	--offset 0x000000 0x080000 \
-	--erase --verify
-endif

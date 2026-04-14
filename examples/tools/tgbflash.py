@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import sys
 import logging
 import argparse
@@ -102,7 +100,7 @@ class SPIFlashProgrammer:
 
 def main():
     exit_status = 0
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     logger = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser()
@@ -114,12 +112,12 @@ def main():
     args = parser.parse_args()
 
     if args.file is None:
-        logger.error("File name not specified")
+        logger.error("Filename is not specified")
         parser.print_usage()
         sys.exit(1)
 
     if args.offset is None:
-        logger.error("Offset not specified")
+        logger.error("Offset is not specified")
         parser.print_usage()
         sys.exit(1)
 
@@ -141,6 +139,10 @@ def main():
         spi.open()
     except Exception as e:
         logger.error(e)
+        logger.info(
+            "If you want to be able to use without root privileges, "
+            "copy examples/tools/50-tgbflash.rules to /etc/udev/rules.d/ and reconnect the USB cable."
+        )
         sys.exit(1)
 
     try:
@@ -150,11 +152,11 @@ def main():
         logger.info("Check JEDEC ID...")
         spi.check_id(bytes([0xEF, 0x40, 0x14]))  # for W25Q80DVSSIG
 
-        logger.info("Reset device...")
+        logger.info("Reset flash...")
         spi.soft_reset()
 
         if args.erase:
-            logger.info("Erase device...")
+            logger.info("Erase flash...")
             spi.chip_erase()
 
         for (file, in_data, ofs) in zip(args.file, binaries, offsets):
