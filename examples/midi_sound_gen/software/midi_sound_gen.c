@@ -6,6 +6,7 @@
 #define NOTE_ACT    0xB000U
 #define NOTE_NUM    0xB001U
 #define NOTE_VEL    0xB002U
+#define CC_VOL      0xB003U
 
 const uint16_t freqs[] = {
   // C    C#     D    D#     E     F    F#     G    G#     A    A#     B   // Oct
@@ -51,7 +52,7 @@ void printhex(uint16_t n, uint8_t d) {
     printf("%c", hex[0xF & (n >> (i << 2))]);
 }
 
-void tim() {
+void tim(void) {
   uint8_t i;
   
   for (i = 0; i < 3; i++) {
@@ -88,7 +89,7 @@ void tim() {
     amp_prev[i] = amp[i];
 }
 
-void main() {
+void main(void) {
   freq[0] = 0;
   freq[1] = 0;
   freq[2] = 0;
