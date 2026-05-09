@@ -1,6 +1,8 @@
 module mult_8x8 #(
   parameter [0:0] REG_INPUT  = 1'b1,
-  parameter [0:0] REG_OUTPUT = 1'b1
+  parameter [0:0] REG_OUTPUT = 1'b1,
+  parameter       A_SIGNED   = 1'b0,
+  parameter       B_SIGNED   = 1'b0
 )(
   input  logic        clk,
   input  logic [ 7:0] in_a,
@@ -33,8 +35,8 @@ module mult_8x8 #(
     .BOTADDSUB_UPPERINPUT     (1'b0      ),  // C19      - Input Y of upper adder/subtractor
     .BOTADDSUB_CARRYSELECT    (2'b00     ),  // C21, C20 - Carry input select, Bottom adder/subtractor
     .MODE_8x8                 (1'b1      ),  // C22      - Select 8 x 8 Multiplier mode
-    .A_SIGNED                 (1'b0      ),  // C23      - Input A sign
-    .B_SIGNED                 (1'b0      )   // C24      - Input B sign
+    .A_SIGNED                 (A_SIGNED  ),  // C23      - Input A sign
+    .B_SIGNED                 (B_SIGNED  )   // C24      - Input B sign
   ) SB_MAC16_inst_8x8 (
     .CLK        (clk         ),  // i       - Clock input
     .CE         (1'b1        ),  // i       - Clock enable input
@@ -70,7 +72,9 @@ endmodule
 module mult_16x16 #(
   parameter [0:0] REG_INPUT    = 1'b1,
   parameter [0:0] REG_INTERNAL = 1'b1,
-  parameter [0:0] REG_OUTPUT   = 1'b1
+  parameter [0:0] REG_OUTPUT   = 1'b1,
+  parameter       A_SIGNED     = 1'b0,
+  parameter       B_SIGNED     = 1'b0
 )(
   input  logic        clk,
   input  logic [15:0] in_a,
@@ -97,8 +101,8 @@ module mult_16x16 #(
     .BOTADDSUB_UPPERINPUT     (1'b0        ),  // C19      - Input Y of upper adder/subtractor
     .BOTADDSUB_CARRYSELECT    (2'b00       ),  // C21, C20 - Carry input select, Bottom adder/subtractor
     .MODE_8x8                 (1'b0        ),  // C22      - Select 8 x 8 Multiplier mode
-    .A_SIGNED                 (1'b0        ),  // C23      - Input A sign
-    .B_SIGNED                 (1'b0        )   // C24      - Input B sign
+    .A_SIGNED                 (A_SIGNED    ),  // C23      - Input A sign
+    .B_SIGNED                 (B_SIGNED    )   // C24      - Input B sign
   ) SB_MAC16_inst_16x16 (
     .CLK        (clk         ),  // i       - Clock input
     .CE         (1'b1        ),  // i       - Clock enable input
