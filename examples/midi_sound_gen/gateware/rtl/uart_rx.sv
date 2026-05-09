@@ -1,9 +1,9 @@
 /* uart_rx.sv - UART receiver, Num. of stop bit: 1, No parity bit */
 
 module uart_rx #(
-  parameter NUM_SYNC_STAGE = 5,    // Number of input synchronizer stages (>=2)
-  parameter BAUDGEN_PERIOD = 640   // System clock frequency / UART Baud rate
-                                   // (e.g.) 20[MHz] / 31.25[kbps] = 640
+  parameter NUM_SYNC_STAGE = 5,         // Number of input synchronizer stages (>=2)
+  parameter FREQ_SYSCLK    = 20000000,  // System clock frequency
+  parameter BAUDRATE       = 31250      // UART Baud rate
 )(
   input  logic       clk,      // System clock input
   input  logic       reset_n,  // Reset input
@@ -13,6 +13,7 @@ module uart_rx #(
   output logic       f_error   // Flaming error output
 );
 
+  localparam BAUDGEN_PERIOD = FREQ_SYSCLK / BAUDRATE;
   localparam BAUDGEN_PERIOD_HALF = BAUDGEN_PERIOD / 2;
 
   logic [NUM_SYNC_STAGE-1:0] rx_buf;

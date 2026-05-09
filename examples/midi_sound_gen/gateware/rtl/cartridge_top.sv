@@ -60,6 +60,17 @@ module cartridge_top (
   logic [ 7:0] bus_D_out_midi;
   logic [ 3:0] note_act;
 
+  logic [ 7:0] mult8x8_in_a;
+  logic [ 7:0] mult8x8_in_b;
+  logic [15:0] mult8x8_out;
+
+  logic [15:0] mult16x16_in_a;
+  logic [15:0] mult16x16_in_b;
+  logic [31:0] mult16x16_out;
+
+  logic [15:0] nrfreq_in;
+  logic [15:0] nrfreq_out;
+
   assign cart_addr = {(bus_A_s[15:14] == 2'b00) ? 3'd0 : rom_bank, bus_A_s[13:0]};
   assign bus_D_dir = bus_nRD | (bus_A[15] ? ~bus_A[13] : 1'b0);  // L: read (cartridge -> GB), H: write (GB -> cartridge)
   assign bus_D_oe = {8{~bus_D_dir}};
@@ -83,19 +94,46 @@ module cartridge_top (
   end
 
   always_ff @(posedge clk_20M) begin
-    // case (bus_A_s)
-    //   16'hB000:
-    //     bus_D_out <= {7'b0, midi_note_act};
-    //   16'hB001:
-    //     bus_D_out <= {1'b0, midi_note_num};
-    //   16'hB002:
-    //     bus_D_out <= {1'b0, midi_note_vel};
-    //   16'hB003:
-    //     bus_D_out <= {1'b0, midi_cc_volume};
-    //   default:
-    //     bus_D_out <= cart_rd;
-    // endcase
-    bus_D_out <= bus_A_s[15:12] == 4'hB ? bus_D_out_midi : cart_rd;
+    casex (bus_A_s)
+      16'b1011_0xxx_xxxx_xxxx:  // B000 - B7FF
+        bus_D_out <= bus_D_out_midi;
+      16'b1011_10xx_xxxx_x000:  // B800
+        bus_D_out <= mult16x16_in_a[ 7:0];
+      16'b1011_10xx_xxxx_x001:  // B801
+        bus_D_out <= mult16x16_in_a[15:8];
+      16'b1011_10xx_xxxx_x010:  // B802
+        bus_D_out <= mult16x16_in_b[ 7:0];
+      16'b1011_10xx_xxxx_x011:  // B803
+        bus_D_out <= mult16x16_in_b[15:8];
+      16'b1011_10xx_xxxx_x100:  // B804
+        bus_D_out <= mult16x16_out[ 7: 0];
+      16'b1011_10xx_xxxx_x101:  // B805
+        bus_D_out <= mult16x16_out[15: 8];
+      16'b1011_10xx_xxxx_x110:  // B806
+        bus_D_out <= mult16x16_out[23:16];
+      16'b1011_10xx_xxxx_x111:  // B807
+        bus_D_out <= mult16x16_out[31:24];
+      16'b1011_11xx_xxxx_xx00:  // BC00
+        bus_D_out <= nrfreq_in[ 7:0];
+      16'b1011_11xx_xxxx_xx01:  // BC01
+        bus_D_out <= nrfreq_in[15:8];
+      16'b1011_11xx_xxxx_xx10:  // BC02
+        bus_D_out <= nrfreq_out[ 7:0];
+      16'b1011_11xx_xxxx_xx11:  // BC03
+        bus_D_out <= nrfreq_out[15:8];
+      default:
+        bus_D_out <= cart_rd;
+    endcase
+  end
+
+  always_ff @(posedge clk_20M) begin
+    mult16x16_in_a[ 7:0] <= wr_posedge & (bus_A_s[15:10] == {4'hB, 2'b10}) & (bus_A_s[2:0] == 3'h0) ? bus_D_in_s : mult16x16_in_a[ 7:0];
+    mult16x16_in_a[15:8] <= wr_posedge & (bus_A_s[15:10] == {4'hB, 2'b10}) & (bus_A_s[2:0] == 3'h1) ? bus_D_in_s : mult16x16_in_a[15:8];
+    mult16x16_in_b[ 7:0] <= wr_posedge & (bus_A_s[15:10] == {4'hB, 2'b10}) & (bus_A_s[2:0] == 3'h2) ? bus_D_in_s : mult16x16_in_b[ 7:0];
+    mult16x16_in_b[15:8] <= wr_posedge & (bus_A_s[15:10] == {4'hB, 2'b10}) & (bus_A_s[2:0] == 3'h3) ? bus_D_in_s : mult16x16_in_b[15:8];
+
+    nrfreq_in[ 7:0] <= wr_posedge & (bus_A_s[15:10] == {4'hB, 2'b11}) & (bus_A_s[1:0] == 2'h0) ? bus_D_in_s : nrfreq_in[ 7:0];
+    nrfreq_in[15:8] <= wr_posedge & (bus_A_s[15:10] == {4'hB, 2'b11}) & (bus_A_s[1:0] == 2'h1) ? bus_D_in_s : nrfreq_in[15:8];
   end
 
   reset_gen reset_gen_inst (
@@ -165,8 +203,8 @@ module cartridge_top (
   );
 
   pipe_buf #(
-    .WIDTH     (        16),
-    .NUM_STAGE (         4)
+    .WIDTH     (16),
+    .NUM_STAGE ( 4)
   ) sync_bus_A (
     .clk       (clk_20M   ),
     .din       (bus_A     ),
@@ -174,8 +212,8 @@ module cartridge_top (
   );
 
   pipe_buf #(
-    .WIDTH     (         8),
-    .NUM_STAGE (         4)
+    .WIDTH     (8),
+    .NUM_STAGE (4)
   ) sync_bus_D_in (
     .clk       (clk_20M   ),
     .din       (bus_D_in  ),
@@ -189,6 +227,23 @@ module cartridge_top (
     .bus_A        (bus_A_s[7:0]  ),
     .bus_D_out    (bus_D_out_midi),
     .note_act     (note_act      )
+  );
+
+  mult_16x16 #(
+    .REG_INPUT    (1),
+    .REG_INTERNAL (1),
+    .REG_OUTPUT   (1)
+  ) mult_16x16_inst (
+    .clk        (clk_20M       ),
+    .in_a       (mult16x16_in_a),
+    .in_b       (mult16x16_in_b),
+    .out        (mult16x16_out )
+  );
+
+  nrfreq_interpolator nrfreq_interpolator_inst (
+    .clk  (clk_20M   ),
+    .din  (nrfreq_in ),
+    .dout (nrfreq_out)
   );
 
   led_driver led_driver_inst (

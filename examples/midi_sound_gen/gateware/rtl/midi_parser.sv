@@ -5,21 +5,24 @@ module midi_perser (
   input  logic        reset_n,
 
   /* Inputs from UART */
-  input  logic [ 7:0] d_in,          // Data input
-  input  logic        d_valid,       // Data valid input
+  input  logic [ 7:0] d_in,            // Data input
+  input  logic        d_valid,         // Data valid input
 
   /* MIDI Perser outputs */
-  output logic        v_valid,       // Voice message is valid
-  output logic [ 3:0] v_channel,     // Channel number
+  output logic        v_valid,         // Voice message is valid
+  output logic [ 3:0] v_channel,       // Channel number
 
-  output logic        v_noteoff,     // Voice message is note-off
-  output logic        v_noteon,      // Voice message is note-on
-  output logic [ 6:0] v_note_num,    // Note number
-  output logic [ 6:0] v_note_vel,    // Note velocity
+  output logic        v_noteoff,       // Voice message is note-off
+  output logic        v_noteon,        // Voice message is note-on
+  output logic [ 6:0] v_note_num,      // Note number
+  output logic [ 6:0] v_note_vel,      // Note velocity
 
-  output logic        v_control,     // Voice message is control change
-  output logic [ 6:0] v_control_num, // Control change number
-  output logic [ 6:0] v_control_val  // Control change value
+  output logic        v_control,       // Voice message is control change
+  output logic [ 6:0] v_control_num,   // Control change number
+  output logic [ 6:0] v_control_val,   // Control change value
+
+  output logic        v_pitchbend,     // Voice message is pitch bend
+  output logic [13:0] v_pitchbend_val  // Pitch bend value
 );
 
   localparam [2:0]
@@ -29,25 +32,16 @@ module midi_perser (
     V_CONTROL     = 3'd3,  // BnH
     V_PROGRAM     = 3'd4,  // CnH
     V_AFTERTOUCH  = 3'd5,  // DnH
-    V_PITCHBEND   = 3'd6;  // EnH
+    V_PITCHBEND   = 3'd6,  // EnH
+    V_SYSTEM      = 3'd7;  // FnH
 
   logic [2:0] voice_state;
   logic [1:0] voice_len, voice_len_max;
   logic [7:0] d_in_str;
-  logic is_data_byte, is_status_byte;
+  logic is_data_byte, is_status_byte, is_system_msg;
   
   assign is_data_byte = ~d_in_str[7];
-  assign is_status_byte = d_in_str[7] & ~&d_in_str[6:4];  // 8Xh - EXh
-
-  // logic is_system_msg, is_eox;
-  // logic is_realtime_msg, is_timing_clock, is_start, is_continue, is_stop;
-  // assign is_system_msg = &d_in_str[7:4] & ~d_in_str[3];
-  // assign is_eox = d_in_str == 8'hF7;
-  // assign is_realtime_msg = &d_in_str[7:4] & d_in_str[3];
-  // assign is_timing_clock = d_in_str == 8'hF8;
-  // assign is_start = d_in_str == 8'hFA;
-  // assign is_continue = d_in_str == 8'hFB;
-  // assign is_stop = d_in_str == 8'hFC;
+  assign is_status_byte = d_in_str[7];  // 8xh - Fxh
 
   always_ff @(posedge clk) begin
     if (~reset_n)
@@ -183,5 +177,36 @@ module midi_perser (
     else
       v_control_val <= v_control_val;
   end
+
+  always_ff @(posedge clk) begin
+    if (~reset_n)
+      v_pitchbend <= 1'b0;
+    else if (d_valid_pipe[2] & is_status_byte)
+      v_pitchbend <= voice_state == V_PITCHBEND;
+    else
+      v_pitchbend <= v_pitchbend;
+  end
+
+  logic [6:0] v_pitchbend_val_l, v_pitchbend_val_h;
+
+  always_ff @(posedge clk) begin
+    if (~reset_n)
+      v_pitchbend_val_l <= 7'd0;
+    else if (d_valid_pipe[2] & (voice_len == 2'd1) & (voice_state == V_PITCHBEND))
+      v_pitchbend_val_l <= d_in_str[6:0];
+    else
+      v_pitchbend_val_l <= v_pitchbend_val_l;
+  end
+
+  always_ff @(posedge clk) begin
+    if (~reset_n)
+      v_pitchbend_val_h <= 7'd0;
+    else if (d_valid_pipe[2] & (voice_len == 2'd2) & (voice_state == V_PITCHBEND))
+      v_pitchbend_val_h <= d_in_str[6:0];
+    else
+      v_pitchbend_val_h <= v_pitchbend_val_h;
+  end
+
+  assign v_pitchbend_val = {v_pitchbend_val_h, v_pitchbend_val_l};
 
 endmodule

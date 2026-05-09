@@ -1,7 +1,7 @@
 /* midi_rx.sv - Connection module for receiving MIDI */
 
 module midi_rx #(
-  parameter P2M_MAX_VOICE = 8
+  parameter P2M_MAX_VOICE = 4
 )(
   input  logic       clk,
   input  logic       reset_n,
@@ -14,17 +14,19 @@ module midi_rx #(
   integer i;
   genvar j;
 
-  logic       rx_valid, rx_f_error;
-  logic [7:0] rx_data;
-  logic       v_valid, v_noteoff, v_noteon, v_control;
-  logic [3:0] v_channel;
-  logic [6:0] v_note_num, v_note_vel, v_control_num, v_control_val;
+  logic        rx_valid, rx_f_error;
+  logic [ 7:0] rx_data;
+  logic        v_valid, v_noteoff, v_noteon, v_control, v_pitchbend;
+  logic [ 3:0] v_channel;
+  logic [ 6:0] v_note_num, v_note_vel, v_control_num, v_control_val;
+  logic [13:0] v_pitchbend_val;
 
-  logic [6:0] note_num [0:3];
-  logic [6:0] note_vel [0:3];
-  logic [6:0] cc_volume [0:3];
+  logic [ 6:0] note_num  [0:3];
+  logic [ 6:0] note_vel  [0:3];
+  logic [ 6:0] cc_volume [0:3];
+  logic [13:0] pitchbend [0:3];
 
-  logic [3:0] ch_valid;
+  logic [ 3:0] ch_valid;
 
   always_comb begin
     for (i = 0; i < 4; i = i + 1)
@@ -32,8 +34,9 @@ module midi_rx #(
   end
 
   uart_rx #(
-    .NUM_SYNC_STAGE (  5),
-    .BAUDGEN_PERIOD (640)  // 31.25 kbaud
+    .NUM_SYNC_STAGE (       5),
+    .FREQ_SYSCLK    (20000000),
+    .BAUDRATE       (   31250)
   ) uart_rx_i (
     .clk     (clk       ),
     .reset_n (reset_n   ),
@@ -44,19 +47,21 @@ module midi_rx #(
   );
 
   midi_perser midi_perser_inst (
-    .clk           (clk                   ),
-    .reset_n       (reset_n               ),
-    .d_in          (rx_data               ),
-    .d_valid       (~rx_f_error & rx_valid),
-    .v_valid       (v_valid               ),
-    .v_channel     (v_channel             ),
-    .v_noteoff     (v_noteoff             ),
-    .v_noteon      (v_noteon              ),
-    .v_note_num    (v_note_num            ),
-    .v_note_vel    (v_note_vel            ),
-    .v_control     (v_control             ),
-    .v_control_num (v_control_num         ),
-    .v_control_val (v_control_val         )
+    .clk             (clk                   ),
+    .reset_n         (reset_n               ),
+    .d_in            (rx_data               ),
+    .d_valid         (~rx_f_error & rx_valid),
+    .v_valid         (v_valid               ),
+    .v_channel       (v_channel             ),
+    .v_noteoff       (v_noteoff             ),
+    .v_noteon        (v_noteon              ),
+    .v_note_num      (v_note_num            ),
+    .v_note_vel      (v_note_vel            ),
+    .v_control       (v_control             ),
+    .v_control_num   (v_control_num         ),
+    .v_control_val   (v_control_val         ),
+    .v_pitchbend     (v_pitchbend           ),
+    .v_pitchbend_val (v_pitchbend_val       )
   );
 
   generate
@@ -95,15 +100,34 @@ module midi_rx #(
   end
 
   always_ff @(posedge clk) begin
-    case (bus_A[1:0])
-      2'h0:
+    if (~reset_n) begin
+      for (i = 0; i < 4; i = i + 1)
+        pitchbend[i] <= 14'd8192;
+    end
+    else if (v_valid & v_pitchbend) begin
+      for (i = 0; i < 4; i = i + 1)
+        pitchbend[i] <= ch_valid[i] ? v_pitchbend_val : pitchbend[i];
+    end
+    else begin
+      for (i = 0; i < 4; i = i + 1)
+        pitchbend[i] <= pitchbend[i];
+    end
+  end
+
+  always_ff @(posedge clk) begin
+    case (bus_A[2:0])
+      3'h0:
         bus_D_out <= {7'b0, note_act[bus_A[5:4]]};
-      2'h1:
+      3'h1:
         bus_D_out <= {1'b0, note_num[bus_A[5:4]]};
-      2'h2:
-        bus_D_out <= {1'b0, note_vel[bus_A[5:4]]};
-      2'h3:
+      3'h2:
+        bus_D_out <= {1'b0, note_act[bus_A[5:4]] ? note_vel[bus_A[5:4]] : 7'd0};
+      3'h3:
         bus_D_out <= {1'b0, cc_volume[bus_A[5:4]]};
+      3'h4:
+        bus_D_out <= pitchbend[bus_A[5:4]][7:0];
+      3'h5:
+        bus_D_out <= {2'b00, pitchbend[bus_A[5:4]][13:8]};
       default:
         bus_D_out <= 8'h00;
     endcase
