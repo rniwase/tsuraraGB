@@ -1,212 +1,137 @@
-/* midi_parser.sv - Parse MIDI messages from UART signals */
+/* midi_parser.sv - Parse MIDI messages from UART RX module */
 
 module midi_perser (
   input  logic        clk,
   input  logic        reset_n,
 
-  /* Inputs from UART */
-  input  logic [ 7:0] d_in,            // Data input
-  input  logic        d_valid,         // Data valid input
+  /* Inputs from UART module */
+  input  logic [ 7:0] d_in,               // Data input
+  input  logic        d_valid,            // Data valid input
 
   /* MIDI Perser outputs */
-  output logic        v_valid,         // Voice message is valid
-  output logic [ 3:0] v_channel,       // Channel number
+  output logic        v_valid,            // Voice message is valid
+  output logic [ 3:0] v_channel,          // Channel number
 
-  output logic        v_noteoff,       // Voice message is note-off
-  output logic        v_noteon,        // Voice message is note-on
-  output logic [ 6:0] v_note_num,      // Note number
-  output logic [ 6:0] v_note_vel,      // Note velocity
+  output logic        v_noteoff,          // Voice message is note-off
+  output logic        v_noteon,           // Voice message is note-on
+  output logic [ 6:0] v_note_num,         // Note number
+  output logic [ 6:0] v_note_vel,         // Note velocity
 
-  output logic        v_control,       // Voice message is control change
-  output logic [ 6:0] v_control_num,   // Control change number
-  output logic [ 6:0] v_control_val,   // Control change value
+  output logic        v_keypressure,      // Voice message is polyphonic key pressure
+  output logic [ 6:0] v_keypressure_num,  // Polyphonic key pressure note number
+  output logic [ 6:0] v_keypressure_val,  // Polyphonic key pressure value
 
-  output logic        v_pitchbend,     // Voice message is pitch bend
-  output logic [13:0] v_pitchbend_val  // Pitch bend value
+  output logic        v_control,          // Voice message is control change
+  output logic [ 6:0] v_control_num,      // Control change number
+  output logic [ 6:0] v_control_val,      // Control change value
+
+  output logic        v_program,          // Voice message is program change
+  output logic [ 6:0] v_program_num,      // Program change number
+
+  output logic        v_aftertouch,       // Voice message is aftertouch (channel pressure)
+  output logic [ 6:0] v_aftertouch_val,   // Aftertouch value
+
+  output logic        v_pitchbend,        // Voice message is pitch bend
+  output logic [13:0] v_pitchbend_val     // Pitch bend value
 );
 
-  localparam [2:0]
-    V_NOTEOFF     = 3'd0,  // 8nH
-    V_NOTEON      = 3'd1,  // 9nH
-    V_KEYPRESSURE = 3'd2,  // AnH
-    V_CONTROL     = 3'd3,  // BnH
-    V_PROGRAM     = 3'd4,  // CnH
-    V_AFTERTOUCH  = 3'd5,  // DnH
-    V_PITCHBEND   = 3'd6,  // EnH
-    V_SYSTEM      = 3'd7;  // FnH
+  typedef enum logic [2:0] {
+    T_NOTEOFF,      // 8nH
+    T_NOTEON,       // 9nH
+    T_KEYPRESSURE,  // AnH
+    T_CONTROL,      // BnH
+    T_PROGRAM,      // CnH
+    T_AFTERTOUCH,   // DnH
+    T_PITCHBEND,    // EnH
+    T_SYSTEM        // FnH, system messages are ignored in this module
+  } t_voice;
 
-  logic [2:0] voice_state;
-  logic [1:0] voice_len, voice_len_max;
-  logic [7:0] d_in_str;
-  logic is_data_byte, is_status_byte, is_system_msg;
-  
-  assign is_data_byte = ~d_in_str[7];
-  assign is_status_byte = d_in_str[7];  // 8xh - Fxh
+  logic [1:0] v_count, v_len;
+  logic v_system;
 
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      d_in_str <= 8'b0;
-    else if (d_valid)
-      d_in_str <= d_in;
-    else
-      d_in_str <= d_in_str;
-  end
+  t_voice voice_type;
+  assign voice_type = t_voice'(d_in[6:4]);
 
-  logic [2:0] d_valid_pipe;
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      d_valid_pipe <= 3'b0;
-    else
-      d_valid_pipe <= {d_valid_pipe[1:0], d_valid};
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      voice_state <= V_NOTEOFF;
-    else if (d_valid_pipe[0] & is_status_byte)
-      voice_state <= d_in_str[6:4];
-    else
-      voice_state <= voice_state;
-  end
-
-  always_ff @(posedge clk) begin
-    case (voice_state)
-      V_NOTEOFF,
-      V_NOTEON,
-      V_KEYPRESSURE,
-      V_CONTROL,
-      V_PITCHBEND:
-        voice_len_max <= 2'd2;
-      default:
-        voice_len_max <= 2'd1;
-    endcase
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      voice_len <= 2'd0;
-    else if (d_valid_pipe[0]) begin
-      if (is_status_byte)
-        voice_len <= 2'd0;
-      else if (is_data_byte)
-        voice_len <= (voice_len == voice_len_max) ? 2'd1 : voice_len + 2'd1;
-      else
-        voice_len <= voice_len;
-    end
-    else
-      voice_len <= voice_len;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_valid <= 1'b0;
-    else if (d_valid_pipe[2])
-      v_valid <= voice_len == voice_len_max;
-    else
-      v_valid <= 1'b0;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_channel <= 4'd0;
-    else if (d_valid_pipe[2] & is_status_byte)
-      v_channel <= d_in_str[3:0];
-    else
-      v_channel <= v_channel;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_noteoff <= 1'b0;
-    else if (d_valid_pipe[2] & is_status_byte)
-      v_noteoff <= voice_state == V_NOTEOFF;
-    else
-      v_noteoff <= v_noteoff;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_noteon <= 1'b0;
-    else if (d_valid_pipe[2] & is_status_byte)
-      v_noteon <= voice_state == V_NOTEON;
-    else
-      v_noteon <= v_noteon;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_note_num <= 7'd0;
-    else if (d_valid_pipe[2] & (voice_len == 2'd1) & ((voice_state == V_NOTEOFF) | (voice_state == V_NOTEON)))
-      v_note_num <= d_in_str[6:0];
-    else
-      v_note_num <= v_note_num;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_note_vel <= 7'd0;
-    else if (d_valid_pipe[2] & (voice_len == 2'd2) & ((voice_state == V_NOTEOFF) | (voice_state == V_NOTEON)))
-      v_note_vel <= d_in_str[6:0];
-    else
-      v_note_vel <= v_note_vel;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_control <= 1'b0;
-    else if (d_valid_pipe[2] & is_status_byte)
-      v_control <= voice_state == V_CONTROL;
-    else
-      v_control <= v_control;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_control_num <= 7'd0;
-    else if (d_valid_pipe[2] & (voice_len == 2'd1) & (voice_state == V_CONTROL))
-      v_control_num <= d_in_str[6:0];
-    else
-      v_control_num <= v_control_num;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_control_val <= 7'd0;
-    else if (d_valid_pipe[2] & (voice_len == 2'd2) & (voice_state == V_CONTROL))
-      v_control_val <= d_in_str[6:0];
-    else
-      v_control_val <= v_control_val;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_pitchbend <= 1'b0;
-    else if (d_valid_pipe[2] & is_status_byte)
-      v_pitchbend <= voice_state == V_PITCHBEND;
-    else
-      v_pitchbend <= v_pitchbend;
-  end
+  logic is_data_byte, is_status_byte;
+  assign is_status_byte =  d_in[7];  // 8xh - Fxh
+  assign is_data_byte   = ~d_in[7];
 
   logic [6:0] v_pitchbend_val_l, v_pitchbend_val_h;
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_pitchbend_val_l <= 7'd0;
-    else if (d_valid_pipe[2] & (voice_len == 2'd1) & (voice_state == V_PITCHBEND))
-      v_pitchbend_val_l <= d_in_str[6:0];
-    else
-      v_pitchbend_val_l <= v_pitchbend_val_l;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      v_pitchbend_val_h <= 7'd0;
-    else if (d_valid_pipe[2] & (voice_len == 2'd2) & (voice_state == V_PITCHBEND))
-      v_pitchbend_val_h <= d_in_str[6:0];
-    else
-      v_pitchbend_val_h <= v_pitchbend_val_h;
-  end
-
   assign v_pitchbend_val = {v_pitchbend_val_h, v_pitchbend_val_l};
+
+  always_ff @(posedge clk) begin
+    if (~reset_n)
+      v_len <= 2'd1;
+    else if (d_valid & is_status_byte) begin
+      case (voice_type)
+        T_NOTEOFF,
+        T_NOTEON,
+        T_KEYPRESSURE,
+        T_CONTROL,
+        T_PITCHBEND:
+          v_len <= 2'd1;  // 2-Data bytes
+        T_PROGRAM,
+        T_AFTERTOUCH,
+        T_SYSTEM:
+          v_len <= 2'd0;  // 1-Data bytes
+      endcase
+    end
+    else
+      v_len <= v_len;
+  end
+
+  always_ff @(posedge clk) begin
+    if (~reset_n)
+      v_count <= 2'd0;
+    else if (d_valid) begin
+      if (is_status_byte)
+        v_count <= 2'd0;
+      else if (is_data_byte)
+        v_count <= (v_count == v_len) ? 2'd0 : v_count + 2'd1;  // Running status
+      else
+        v_count <= v_count;
+    end
+    else
+      v_count <= v_count;
+  end
+
+  always_ff @(posedge clk) begin
+    if (~reset_n) begin
+      v_valid       <= 1'b0;
+      v_noteoff     <= 1'b0;
+      v_noteon      <= 1'b0;
+      v_keypressure <= 1'b0;
+      v_control     <= 1'b0;
+      v_program     <= 1'b0;
+      v_aftertouch  <= 1'b0;
+      v_pitchbend   <= 1'b0;
+      v_system      <= 1'b0;
+    end
+    else begin
+      v_valid       <= d_valid & ~v_system & (v_count == v_len);
+      v_noteoff     <= (d_valid & is_status_byte) ? (voice_type == T_NOTEOFF    ) : v_noteoff;
+      v_noteon      <= (d_valid & is_status_byte) ? (voice_type == T_NOTEON     ) : v_noteon;
+      v_keypressure <= (d_valid & is_status_byte) ? (voice_type == T_KEYPRESSURE) : v_keypressure;
+      v_control     <= (d_valid & is_status_byte) ? (voice_type == T_CONTROL    ) : v_control;
+      v_program     <= (d_valid & is_status_byte) ? (voice_type == T_PROGRAM    ) : v_program;
+      v_aftertouch  <= (d_valid & is_status_byte) ? (voice_type == T_AFTERTOUCH ) : v_aftertouch;
+      v_pitchbend   <= (d_valid & is_status_byte) ? (voice_type == T_PITCHBEND  ) : v_pitchbend;
+      v_system      <= (d_valid & is_status_byte) ? (voice_type == T_SYSTEM     ) : v_system;
+    end
+  end
+
+  always_ff @(posedge clk) begin
+    v_channel         <= (d_valid & is_status_byte) ? d_in[3:0] : v_channel;
+    v_note_num        <= (d_valid & (v_noteoff | v_noteon) & (v_count == 2'd0)) ? d_in[6:0] : v_note_num;
+    v_note_vel        <= (d_valid & (v_noteoff | v_noteon) & (v_count == 2'd1)) ? d_in[6:0] : v_note_vel;
+    v_keypressure_num <= (d_valid & v_keypressure          & (v_count == 2'd0)) ? d_in[6:0] : v_keypressure_num;
+    v_keypressure_val <= (d_valid & v_keypressure          & (v_count == 2'd1)) ? d_in[6:0] : v_keypressure_val;
+    v_control_num     <= (d_valid & v_control              & (v_count == 2'd0)) ? d_in[6:0] : v_control_num;
+    v_control_val     <= (d_valid & v_control              & (v_count == 2'd1)) ? d_in[6:0] : v_control_val;
+    v_program_num     <= (d_valid & v_program              & (v_count == 2'd0)) ? d_in[6:0] : v_program_num;
+    v_aftertouch_val  <= (d_valid & v_aftertouch           & (v_count == 2'd0)) ? d_in[6:0] : v_aftertouch_val;
+    v_pitchbend_val_l <= (d_valid & v_pitchbend            & (v_count == 2'd0)) ? d_in[6:0] : v_pitchbend_val_l;
+    v_pitchbend_val_h <= (d_valid & v_pitchbend            & (v_count == 2'd1)) ? d_in[6:0] : v_pitchbend_val_h;
+  end
 
 endmodule

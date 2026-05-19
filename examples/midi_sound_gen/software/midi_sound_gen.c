@@ -328,7 +328,8 @@ void main(void) {
   }
 
   TMA_REG = 0x00U;  // Set TMA to divide clock by 0x100
-  TAC_REG = 0x07U;  // Set clock to 16384 Hertz
+  // TAC_REG = 0x07U;  // Set clock to 16384 Hertz
+  TAC_REG = 0x06U;  // Set clock to 65536 Hertz
   set_interrupts(TIM_IFLAG);  // Handle TIM interrupts
 
   while (1) {

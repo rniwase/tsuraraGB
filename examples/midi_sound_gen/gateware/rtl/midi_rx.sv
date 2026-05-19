@@ -1,7 +1,10 @@
 /* midi_rx.sv - Connection module for receiving MIDI */
 
 module midi_rx #(
-  parameter P2M_MAX_VOICE = 4
+  parameter NUM_SYNC_STAGE = 5,
+  parameter FREQ_SYSCLK    = 20000000,
+  parameter BAUDRATE       = 31250,
+  parameter MAX_VOICE      = 4
 )(
   input  logic       clk,
   input  logic       reset_n,
@@ -26,6 +29,8 @@ module midi_rx #(
   logic [ 6:0] cc_volume [0:3];
   logic [13:0] pitchbend [0:3];
 
+  logic [ 3:0] all_notes_off;
+
   logic [ 3:0] ch_valid;
 
   always_comb begin
@@ -34,16 +39,16 @@ module midi_rx #(
   end
 
   uart_rx #(
-    .NUM_SYNC_STAGE (       5),
-    .FREQ_SYSCLK    (20000000),
-    .BAUDRATE       (   31250)
+    .NUM_SYNC_STAGE (NUM_SYNC_STAGE),
+    .FREQ_SYSCLK    (FREQ_SYSCLK   ),
+    .BAUDRATE       (BAUDRATE      )
   ) uart_rx_i (
-    .clk     (clk       ),
-    .reset_n (reset_n   ),
-    .rx_in   (midi_in   ),
-    .valid   (rx_valid  ),
-    .d_out   (rx_data   ),
-    .f_error (rx_f_error)
+    .clk            (clk           ),
+    .reset_n        (reset_n       ),
+    .rx_in          (midi_in       ),
+    .valid          (rx_valid      ),
+    .d_out          (rx_data       ),
+    .f_error        (rx_f_error    )
   );
 
   midi_perser midi_perser_inst (
@@ -67,10 +72,10 @@ module midi_rx #(
   generate
     for (j = 0; j < 4; j = j + 1) begin: gen_poly2mono
       poly2mono #(
-        .MAX_VOICE     (P2M_MAX_VOICE)
+        .MAX_VOICE     (MAX_VOICE            )
       ) poly2mono_inst (
         .clk           (clk                  ),
-        .reset_n       (reset_n              ),
+        .reset_n       (reset_n & ~all_notes_off[j]),
         .busy          (                     ),
         .v_valid_in    (v_valid & ch_valid[j]),
         .v_noteon_in   (v_noteon             ),
@@ -112,6 +117,11 @@ module midi_rx #(
       for (i = 0; i < 4; i = i + 1)
         pitchbend[i] <= pitchbend[i];
     end
+  end
+
+  always @(posedge clk) begin
+    for (i = 0; i < 4; i = i + 1)
+      all_notes_off[i] <= v_valid & ch_valid[i] & (v_control_num == 7'd123);
   end
 
   always_ff @(posedge clk) begin

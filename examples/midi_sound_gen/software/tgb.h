@@ -24,10 +24,6 @@
 #define CH3_CC_VOL      *( uint8_t *)0xB033U
 #define CH3_PITCHBEND   *(uint16_t *)0xB034U
 
-#define MULT8x8_IN_A    *( uint8_t *)0xB800U
-#define MULT8x8_IN_B    *( uint8_t *)0xB802U
-#define MULT8x8_OUT     *(uint16_t *)0xB804U
-
 #define MULT16x16_IN_A  *(uint16_t *)0xB800U
 #define MULT16x16_IN_B  *(uint16_t *)0xB802U
 #define MULT16x16_OUT   *(uint32_t *)0xB804U

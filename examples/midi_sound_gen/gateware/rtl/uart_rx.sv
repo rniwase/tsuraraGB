@@ -58,24 +58,11 @@ module uart_rx #(
       baudgen_b_count <= baudgen_t_match ? baudgen_b_count + 5'd1 : baudgen_b_count;
   end
 
-  always_ff @(posedge clk)
+  always_ff @(posedge clk) begin
     d_shiftreg <= sample_tmg ? {rx_sync, d_shiftreg[8:1]} : d_shiftreg;
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      d_out <= 8'd0;
-    else
-      d_out <= endofrx ? d_shiftreg[7:0] : d_out;
-  end
-
-  always_ff @(posedge clk) begin
-    if (~reset_n)
-      f_error <= 1'b0;
-    else
-      f_error <= endofrx ? ~d_shiftreg[8] : f_error;
-  end
-
-  always_ff @(posedge clk)
+    d_out <= endofrx ? d_shiftreg[7:0] : d_out;
+    f_error <= endofrx ? ~d_shiftreg[8] : f_error;
     valid <= endofrx;
+  end
 
 endmodule

@@ -72,24 +72,24 @@ module poly2mono #(
   assign s_mask = {1'b1         , {(BW_VOICES){s_mask_priority}}, {(7){s_mask_note_num}}, 7'd0                  };
 
   ptcam #(
-    .DWIDTH          (BW_VOICES+15),
-    .MEMSIZE         (MAX_VOICE   )
+    .DWIDTH     (BW_VOICES + 15     ),
+    .DEPTH      (MAX_VOICE          )
   ) ptcam_inst (
-    .clk             (clk         ),
-    .reset_n         (reset_n     ),
-    .w_addr          (w_addr      ),
-    .w_din           (w_din       ),
-    .w_mask          (w_mask      ),
-    .w_en            (w_en        ),
-    .r_addr          ('d0         ),
-    .r_dout          (            ),
-    .search_din      (s_din       ),
-    .search_mask     (s_mask      ),
-    .search_en       (s_en        ),
-    .search_valid    (s_valid     ),
-    .search_dout     (s_dout      ),
-    .search_addr_out (s_addr_out  ),
-    .search_notfound (s_notfound  )
+    .clk        (clk                ),
+    .reset_n    (reset_n            ),
+    .w_addr     (w_addr             ),
+    .w_din      (w_din              ),
+    .w_mask     (w_mask             ),
+    .w_en       (w_en               ),
+    .r_addr     ({(BW_VOICES){1'b0}}),
+    .r_dout     (                   ),
+    .s_din      (s_din              ),
+    .s_mask     (s_mask             ),
+    .s_en       (s_en               ),
+    .s_valid    (s_valid            ),
+    .s_dout     (s_dout             ),
+    .s_addr_out (s_addr_out         ),
+    .s_notfound (s_notfound         )
   );
 
   assign busy = (state != S_IDLE);
@@ -103,40 +103,32 @@ module poly2mono #(
         S_UPDATE_LIST,
         S_UPDATE_TO_LAST_VOICED:
           state <= S_IDLE;
-
         S_IDLE:
-          state <= note_msg_vld ? S_STORE_INPUT : state;
-
+          state <= t_state'(note_msg_vld ? S_STORE_INPUT : S_IDLE);
         S_STORE_INPUT:
           state <= S_SEARCH_SAME_NOTE;
-
         S_SEARCH_SAME_NOTE:
           state <= S_SEARCH_SAME_NOTE_WAIT;
-
         S_SEARCH_SAME_NOTE_WAIT: begin
           if (s_valid) begin
             if (note_on_str & |note_vel_str)
-              state <= s_notfound ? S_SEARCH_NONACTIVE : S_UPDATE_VELOCITY;
+              state <= t_state'(s_notfound ? S_SEARCH_NONACTIVE : S_UPDATE_VELOCITY);
             else
-              state <= s_notfound ? S_IDLE : S_CLEAR_ACTIVE;
+              state <= t_state'(s_notfound ? S_IDLE : S_CLEAR_ACTIVE);
           end
           else
-            state <= state;
+            state <= S_SEARCH_SAME_NOTE_WAIT;
         end
-
         S_SEARCH_NONACTIVE:
           state <= S_SEARCH_NONACTIVE_WAIT;
-
         S_SEARCH_NONACTIVE_WAIT: begin
           if (s_valid)
-            state <= s_notfound ? S_IDLE : S_UPDATE_LIST;
+            state <= t_state'(s_notfound ? S_IDLE : S_UPDATE_LIST);
           else
-            state <= state;
+            state <= S_SEARCH_NONACTIVE_WAIT;
         end
-
         S_CLEAR_ACTIVE:
           state <= S_CHECK_VOICES;
-
         S_CHECK_VOICES: begin
           if (voices[BW_VOICES-1:0] == pcount)
             state <= S_SEARCH_LAST_VOICED;
@@ -145,24 +137,18 @@ module poly2mono #(
           else
             state <= S_IDLE;
         end
-
         S_SEARCH_LAST_VOICED:
           state <= S_SEARCH_LAST_VOICED_WAIT;
-
         S_SEARCH_LAST_VOICED_WAIT:
-          state <= s_valid ? S_UPDATE_TO_LAST_VOICED : state;
-
+          state <= t_state'(s_valid ? S_UPDATE_TO_LAST_VOICED : S_SEARCH_LAST_VOICED_WAIT);
         S_SEARCH_PRIORITY:
           state <= S_SEARCH_PRIORITY_WAIT;
-
         S_SEARCH_PRIORITY_WAIT:
-          state <= s_valid ? S_UPDATE_PRIORITY : state;
-
+          state <= t_state'(s_valid ? S_UPDATE_PRIORITY : S_SEARCH_PRIORITY_WAIT);
         S_UPDATE_PRIORITY:
-          state <= (voices[BW_VOICES-1:0] == pcount) ? S_IDLE : S_SEARCH_PRIORITY;
-
+          state <= t_state'((voices[BW_VOICES-1:0] == pcount) ? S_IDLE : S_SEARCH_PRIORITY);
         default:
-          state <= state;
+          state <= S_IDLE;
       endcase
     end
   end
@@ -225,7 +211,7 @@ module poly2mono #(
       end
     endcase
   end
-  
+
   always_ff @(posedge clk) begin
     case (state)
       S_UPDATE_LIST:
