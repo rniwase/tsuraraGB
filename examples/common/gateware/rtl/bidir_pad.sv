@@ -12,7 +12,7 @@ module bidir_pad #(
 
   genvar i;
   generate
-    for(i = 0; i < WIDTH; i = i + 1) begin: gen_pad_primitive
+    for(i = 0; i < WIDTH; i++) begin: gen_pad_primitive
       SB_IO #(
         .PIN_TYPE          (  6'b100000),
         .PULLUP            (       1'b0),

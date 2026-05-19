@@ -5,7 +5,7 @@ module uart_tx #(
   parameter BAUDRATE    = 31250      // UART Baud rate
 )(
   input  logic       clk,      // System clock input
-  input  logic       reset_n,  // Reset input
+  input  logic       resetn,  // Reset input
   output logic       tx_out,   // UART TX output
   input  logic       valid,    // Data valid input
   output logic       ready,    // Data ready output
@@ -16,7 +16,7 @@ module uart_tx #(
 
   logic[7:0] d_storereg;
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       d_storereg <= 8'd0;
     else if (ready & valid)
       d_storereg <= d_in;
@@ -31,7 +31,7 @@ module uart_tx #(
   assign endoftx = baudgen_t_count == BAUDGEN_PERIOD-2 & baudgen_b_count == 4'd9;
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       ready <= 1'b1;
     else if (endoftx)
       ready <= 1'b1;
@@ -55,7 +55,7 @@ module uart_tx #(
   end
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       baudgen_b_count <= 4'd9;
     else if (ready & valid)
       baudgen_b_count <= 4'd0;

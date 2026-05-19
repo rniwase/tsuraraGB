@@ -11,7 +11,7 @@ module poly2mono_testbench;
   parameter MAX_VOICE = 8;
 
   logic       clk;
-  logic       reset_n;
+  logic       resetn;
   logic       busy;
   logic       v_valid_in;
   logic       v_noteon_in;
@@ -24,7 +24,7 @@ module poly2mono_testbench;
 
   logic       fail;
 
-  integer i;
+  int i;
 
   poly2mono #(.MAX_VOICE(MAX_VOICE)) poly2mono_inst (.*);
 
@@ -80,11 +80,11 @@ module poly2mono_testbench;
     v_noteon_in <= 1'b0;
     v_note_num_in <= 7'h0;
     v_note_vel_in <= 7'h0;
-    reset_n <= 1'b0;
+    resetn <= 1'b0;
     fail <= 1'b0;
 
     repeat (10) @(posedge clk);
-    reset_n <= 1'b1;
+    resetn <= 1'b1;
     repeat (10) @(posedge clk);
 
     $display("Check reset status");
@@ -143,14 +143,14 @@ module poly2mono_testbench;
     check_output(.act   (1'b0),                 .num(7'hxx), .vel(7'hxx));
 
     $display("Testing maximum voices with ascending ordered note off");
-    for (i = 0; i < MAX_VOICE; i = i + 1) begin
+    for (i = 0; i < MAX_VOICE; i++) begin
       update_input(.noteon(1'b1), .noteoff(1'b0), .num(7'h10 + i), .vel(7'h7F));
       check_output(.act   (1'b1),                 .num(7'h10 + i), .vel(7'h7F));
     end
     update_input(.noteon(1'b1), .noteoff(1'b0), .num(7'h7F                ), .vel(7'h7F));  // MAX_VOICE + 1 -> ignore
     check_output(.act   (1'b1),                 .num(7'h10 + MAX_VOICE - 1), .vel(7'h7F));
 
-    for (i = 0; i < MAX_VOICE - 1; i = i + 1) begin
+    for (i = 0; i < MAX_VOICE - 1; i++) begin
       repeat (10) @(posedge clk);
       update_input(.noteon(1'b0), .noteoff(1'b1), .num(7'h10 + i            ), .vel(7'hxx));
       check_output(.act   (1'b1),                 .num(7'h10 + MAX_VOICE - 1), .vel(7'h7F));
@@ -159,7 +159,7 @@ module poly2mono_testbench;
     check_output(.act   (1'b0),                 .num(7'hxx                ), .vel(7'hxx));
 
     $display("Testing maximum voices with descending ordered note off");
-    for (i = 0; i < MAX_VOICE; i = i + 1) begin
+    for (i = 0; i < MAX_VOICE; i++) begin
       update_input(.noteon(1'b1), .noteoff(1'b0), .num(7'h10 + i), .vel(7'h7F));
       check_output(.act   (1'b1),                 .num(7'h10 + i), .vel(7'h7F));
     end
@@ -187,9 +187,9 @@ module poly2mono_testbench;
     check_output(.act   (1'b1),                 .num(7'h02), .vel(7'h02));
 
     $display("Reset and check status");
-    reset_n <= 1'b0;
+    resetn <= 1'b0;
     @(posedge clk);
-    reset_n <= 1'b1;
+    resetn <= 1'b1;
     check_output(.act   (1'b0),                 .num(7'hxx), .vel(7'hxx));
 
     $display("Note on (3,3) -> (3,3)");

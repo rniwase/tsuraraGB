@@ -29,7 +29,7 @@ module cartridge_top (
   output logic        vin
 );
 
-  logic        reset_n;
+  logic        resetn;
   logic        load_done;
 
   logic        spi_enable;
@@ -74,7 +74,7 @@ module cartridge_top (
   assign vin = 1'bx;
 
   always_ff @(posedge clk_20M) begin
-    if (~reset_n)
+    if (~resetn)
       rom_bank <= 3'd1;
     else if (wr_posedge & (bus_A_s[15:13] == 3'b001))  // bus : 2000 - 3FFF
       rom_bank <= (bus_D_in_s[2:0] == 3'd0) ? 3'd1 : bus_D_in_s[2:0];
@@ -130,7 +130,7 @@ module cartridge_top (
 
   reset_gen reset_gen_inst (
     .clk         (clk_20M),
-    .reset_n_out (reset_n)
+    .resetn_out  (resetn )
   );
 
   spi_master #(
@@ -138,7 +138,7 @@ module cartridge_top (
     .INPUT_SYNC (4'd5        )
   ) spi_master_inst (
     .clk        (clk_20M     ),
-    .reset_n    (reset_n     ),
+    .resetn     (resetn      ),
     .enable     (spi_enable  ),
     .idle       (spi_idle    ),
     .tx_len     (spi_tx_len  ),
@@ -159,7 +159,7 @@ module cartridge_top (
     .RESET_TIME   (10'd700     )
   ) flash2spram_inst (
     .clk          (clk_20M     ),
-    .reset_n      (reset_n     ),
+    .resetn       (resetn      ),
     .load_done    (load_done   ),
     .spram_addr   (loader_addr ),
     .spram_we     (loader_we   ),

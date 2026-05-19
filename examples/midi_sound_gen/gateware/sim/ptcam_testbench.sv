@@ -13,7 +13,7 @@ module ptcam_testbench;
   localparam AWIDTH = $clog2(DEPTH);
 
   logic              clk;
-  logic              reset_n;
+  logic              resetn;
   logic [AWIDTH-1:0] w_addr;
   logic [DWIDTH-1:0] w_din;
   logic [DWIDTH-1:0] w_mask;
@@ -32,7 +32,7 @@ module ptcam_testbench;
   logic [DWIDTH-1:0] r_dout_check;
   logic              s_fail;
 
-  integer i;
+  int i;
 
   ptcam #(.DWIDTH(DWIDTH), .DEPTH(DEPTH)) ptcam_inst (.*);
 
@@ -46,26 +46,26 @@ module ptcam_testbench;
     r_dout_check <= {4{r_addr[3:0]}};
 
   initial begin
-    w_addr  <= '0;
-    r_addr  <= '0;
-    w_mask  <= ~'0;
-    w_en    <= 1'b0;
-    w_din   <= '0;
-    s_din   <= '0;
-    s_mask  <= ~'0;
-    s_en    <= 1'b0;
-    reset_n <= 1'b0;
-    r_fail  <= 1'b0;
-    s_fail  <= 1'b0;
+    w_addr <= '0;
+    r_addr <= '0;
+    w_mask <= ~'0;
+    w_en   <= 1'b0;
+    w_din  <= '0;
+    s_din  <= '0;
+    s_mask <= ~'0;
+    s_en   <= 1'b0;
+    resetn <= 1'b0;
+    r_fail <= 1'b0;
+    s_fail <= 1'b0;
 
     repeat (10) @(posedge clk);
-    reset_n <= 1'b1;
+    resetn <= 1'b1;
     repeat (10) @(posedge clk);
 
     // Write test data
     w_en <= 1'b1;
     w_mask <= ~'0;
-    for (i=0; i<DEPTH; i=i+1) begin
+    for (i = 0; i < DEPTH; i++) begin
       w_addr <= i[AWIDTH-1:0];
       w_din <= {4{i[3:0]}};
       @(posedge clk);
@@ -74,7 +74,7 @@ module ptcam_testbench;
     w_en <= 1'b0;
 
     // Test read data
-    for (i=0; i<DEPTH; i=i+1) begin
+    for (i = 0; i < DEPTH; i++) begin
       r_addr <= i[AWIDTH-1:0];
       @(posedge clk);
       #1;
@@ -84,7 +84,7 @@ module ptcam_testbench;
 
     // Test valid search
     s_mask <= ~'0;
-    for (i=0; i<DEPTH; i=i+1) begin
+    for (i = 0; i < DEPTH; i++) begin
       s_din <= {4{i[3:0]}};
       s_en <= 1'b1;
       @(posedge clk);

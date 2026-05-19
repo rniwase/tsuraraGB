@@ -5,7 +5,7 @@ module spi_master #(
   parameter    [ 3:0] INPUT_SYNC = 4'd5
 )(
   input  logic        clk,
-  input  logic        reset_n,
+  input  logic        resetn,
 
   /* User interface */
   input  logic        enable,
@@ -72,7 +72,7 @@ module spi_master #(
   assign sck_rise_sync = sck_rise_buf[INPUT_SYNC];
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       state <= S_IDLE;
     else begin
       case (state)
@@ -207,7 +207,7 @@ module spi_master #(
   end
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       spi_ss_pre <= 1'b1;
     else begin
       case (state)

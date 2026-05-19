@@ -17,7 +17,7 @@ module SP256K_4x (
 
   genvar i;
   generate
-    for (i = 0; i < 4; i = i + 1) begin: gen_SP256K_primitive
+    for (i = 0; i < 4; i++) begin: gen_SP256K_primitive
       SB_SPRAM256KA SB_SPRAM256KA_inst (
         .ADDRESS    (addr[14:1]                            ),
         .DATAIN     ({din, din}                            ),

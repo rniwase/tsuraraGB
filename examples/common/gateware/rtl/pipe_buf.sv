@@ -14,7 +14,7 @@ module pipe_buf #(
 
   always_ff @(posedge clk) begin
     buffer[0] <= din;
-    for (i = 1; i < NUM_STAGE; i = i + 1)
+    for (i = 1; i < NUM_STAGE; i++)
       buffer[i] <= buffer[i-1];
   end
 

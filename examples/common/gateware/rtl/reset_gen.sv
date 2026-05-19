@@ -4,7 +4,7 @@ module reset_gen #(
   parameter ASSERT_LEN = 63
 )(
   input  logic clk,
-  output logic reset_n_out
+  output logic resetn_out
 );
 
   localparam CNT_WIDTH = $clog2(ASSERT_LEN + 1);;
@@ -15,12 +15,12 @@ module reset_gen #(
 
   initial begin
     count <= CNT_WIDTH'(0);
-    reset_n_out <= 1'b0;
+    resetn_out <= 1'b0;
   end
 
   always_ff @(posedge clk) begin
     count <= count_match ? count : count + CNT_WIDTH'(1);
-    reset_n_out <= count_match;
+    resetn_out <= count_match;
   end
 
 endmodule

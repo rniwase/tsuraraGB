@@ -7,14 +7,14 @@ module midi_rx #(
   parameter MAX_VOICE      = 4
 )(
   input  logic       clk,
-  input  logic       reset_n,
+  input  logic       resetn,
   input  logic       midi_in,
   input  logic [7:0] bus_A,
   output logic [7:0] bus_D_out,
   output logic [3:0] note_act
 );
 
-  integer i;
+  int i;
   genvar j;
 
   logic        rx_valid, rx_f_error;
@@ -34,7 +34,7 @@ module midi_rx #(
   logic [ 3:0] ch_valid;
 
   always_comb begin
-    for (i = 0; i < 4; i = i + 1)
+    for (i = 0; i < 4; i++)
       ch_valid[i] = (v_channel == i);
   end
 
@@ -44,7 +44,7 @@ module midi_rx #(
     .BAUDRATE       (BAUDRATE      )
   ) uart_rx_i (
     .clk            (clk           ),
-    .reset_n        (reset_n       ),
+    .resetn         (resetn        ),
     .rx_in          (midi_in       ),
     .valid          (rx_valid      ),
     .d_out          (rx_data       ),
@@ -53,7 +53,7 @@ module midi_rx #(
 
   midi_perser midi_perser_inst (
     .clk             (clk                   ),
-    .reset_n         (reset_n               ),
+    .resetn          (resetn                ),
     .d_in            (rx_data               ),
     .d_valid         (~rx_f_error & rx_valid),
     .v_valid         (v_valid               ),
@@ -72,55 +72,55 @@ module midi_rx #(
   generate
     for (j = 0; j < 4; j = j + 1) begin: gen_poly2mono
       poly2mono #(
-        .MAX_VOICE     (MAX_VOICE            )
+        .MAX_VOICE     (MAX_VOICE                 )
       ) poly2mono_inst (
-        .clk           (clk                  ),
-        .reset_n       (reset_n & ~all_notes_off[j]),
-        .busy          (                     ),
-        .v_valid_in    (v_valid & ch_valid[j]),
-        .v_noteon_in   (v_noteon             ),
-        .v_noteoff_in  (v_noteoff            ),
-        .v_note_num_in (v_note_num           ),
-        .v_note_vel_in (v_note_vel           ),
-        .note_act_out  (note_act[j]          ),
-        .note_num_out  (note_num[j]          ),
-        .note_vel_out  (note_vel[j]          )
+        .clk           (clk                       ),
+        .resetn        (resetn & ~all_notes_off[j]),
+        .busy          (                          ),
+        .v_valid_in    (v_valid & ch_valid[j]     ),
+        .v_noteon_in   (v_noteon                  ),
+        .v_noteoff_in  (v_noteoff                 ),
+        .v_note_num_in (v_note_num                ),
+        .v_note_vel_in (v_note_vel                ),
+        .note_act_out  (note_act[j]               ),
+        .note_num_out  (note_num[j]               ),
+        .note_vel_out  (note_vel[j]               )
       );
     end
   endgenerate
 
   always_ff @(posedge clk) begin
-    if (~reset_n) begin
-      for (i = 0; i < 4; i = i + 1)
+    if (~resetn) begin
+      for (i = 0; i < 4; i++)
         cc_volume[i] <= 7'd127;
     end
     else if (v_valid & v_control & (v_control_num == 7'd7)) begin
-      for (i = 0; i < 4; i = i + 1)
+      for (i = 0; i < 4; i++)
         cc_volume[i] <= ch_valid[i] ? v_control_val : cc_volume[i];
     end
     else begin
-      for (i = 0; i < 4; i = i + 1)
+      for (i = 0; i < 4; i++)
         cc_volume[i] <= cc_volume[i];
     end
   end
 
   always_ff @(posedge clk) begin
-    if (~reset_n) begin
-      for (i = 0; i < 4; i = i + 1)
+    if (~resetn) begin
+      for (i = 0; i < 4; i++)
         pitchbend[i] <= 14'd8192;
     end
     else if (v_valid & v_pitchbend) begin
-      for (i = 0; i < 4; i = i + 1)
+      for (i = 0; i < 4; i++)
         pitchbend[i] <= ch_valid[i] ? v_pitchbend_val : pitchbend[i];
     end
     else begin
-      for (i = 0; i < 4; i = i + 1)
+      for (i = 0; i < 4; i++)
         pitchbend[i] <= pitchbend[i];
     end
   end
 
   always @(posedge clk) begin
-    for (i = 0; i < 4; i = i + 1)
+    for (i = 0; i < 4; i++)
       all_notes_off[i] <= v_valid & ch_valid[i] & (v_control_num == 7'd123);
   end
 

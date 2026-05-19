@@ -6,7 +6,7 @@ module flash2spram #(
   parameter [ 9:0] RESET_TIME  = 10'd700  // 35 us @ clk:20MHz
 )(
   input  logic        clk,
-  input  logic        reset_n,
+  input  logic        resetn,
   output logic        load_done,
 
   /* SPRAM 4x interface */
@@ -59,7 +59,7 @@ module flash2spram #(
   assign spi_idle_rise = spi_idle & ~spi_idle_buf;
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       state <= S_IDLE;
 
     else begin
@@ -107,7 +107,7 @@ module flash2spram #(
   end
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       spi_enable <= 1'b0;
     else begin
       case (state)
@@ -124,7 +124,7 @@ module flash2spram #(
   end
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       tx_count <= 2'd0;
     else if (spi_tx_fetch & (state == S_READ))
       tx_count <= (tx_count == 2'd3) ? tx_count : tx_count + 2'd1;
@@ -150,12 +150,12 @@ module flash2spram #(
   end
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       rx_count <= 24'd0;
     else
       rx_count <= spi_rx_store ? rx_count + 24'd1 : rx_count;
   end
-  
+
   always_ff @(posedge clk) begin
     spi_idle_buf <= spi_idle;
     wait_count <= (state == S_WAIT) ? wait_count + 10'd1 : 10'd0;

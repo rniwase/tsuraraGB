@@ -9,10 +9,10 @@ module midi_parser_testbench;
 
   parameter CLK_CYCLE = 50;
 
-  integer i;
+  int i;
 
   logic        clk;
-  logic        reset_n;
+  logic        resetn;
 
   logic [ 7:0] d_in;               // Data input
   logic        d_valid;            // Data valid input
@@ -42,10 +42,10 @@ module midi_parser_testbench;
   task update_input (
     input byte data[]
   );
-    integer i;
+    int i;
     d_valid <= 1'b1;
     $write("   input: ");
-    for (i = 0; i < data.size(); i = i + 1) begin
+    for (i = 0; i < data.size(); i++) begin
       d_in <= data[i];
       $write("%02X ", data[i]);
       @(posedge clk);
@@ -217,11 +217,11 @@ module midi_parser_testbench;
   initial begin
     d_in <= 8'h00;
     d_valid <= 1'b0;
-    reset_n <= 1'b0;
+    resetn <= 1'b0;
     fail <= 1'b0;
 
     repeat (10) @(posedge clk);
-    reset_n <= 1'b1;
+    resetn <= 1'b1;
     repeat (10) @(posedge clk);
 
     $display("Check channel number");

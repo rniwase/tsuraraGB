@@ -2,7 +2,7 @@
 
 module midi_perser (
   input  logic        clk,
-  input  logic        reset_n,
+  input  logic        resetn,
 
   /* Inputs from UART module */
   input  logic [ 7:0] d_in,               // Data input
@@ -60,7 +60,7 @@ module midi_perser (
   assign v_pitchbend_val = {v_pitchbend_val_h, v_pitchbend_val_l};
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       v_len <= 2'd1;
     else if (d_valid & is_status_byte) begin
       case (voice_type)
@@ -81,7 +81,7 @@ module midi_perser (
   end
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       v_count <= 2'd0;
     else if (d_valid) begin
       if (is_status_byte)
@@ -96,7 +96,7 @@ module midi_perser (
   end
 
   always_ff @(posedge clk) begin
-    if (~reset_n) begin
+    if (~resetn) begin
       v_valid       <= 1'b0;
       v_noteoff     <= 1'b0;
       v_noteon      <= 1'b0;

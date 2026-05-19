@@ -4,7 +4,7 @@ module poly2mono #(
   parameter MAX_VOICE = 8  // Max. of poly voices to store
 )(
   input  logic       clk,
-  input  logic       reset_n,
+  input  logic       resetn,
   output logic       busy,
 
   /* Input from MIDI perser */
@@ -76,7 +76,7 @@ module poly2mono #(
     .DEPTH      (MAX_VOICE          )
   ) ptcam_inst (
     .clk        (clk                ),
-    .reset_n    (reset_n            ),
+    .resetn     (resetn             ),
     .w_addr     (w_addr             ),
     .w_din      (w_din              ),
     .w_mask     (w_mask             ),
@@ -95,7 +95,7 @@ module poly2mono #(
   assign busy = (state != S_IDLE);
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       state <= S_IDLE;
     else begin
       case (state)
@@ -302,7 +302,7 @@ module poly2mono #(
   end
 
   always @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       voices <= 5'd0;
     else begin
       case (state)
@@ -328,7 +328,7 @@ module poly2mono #(
   end
 
   always @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       note_act_out <= 1'b0;
     else begin
       case (state)
@@ -343,7 +343,7 @@ module poly2mono #(
   end
 
   always @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       note_num_out <= 7'd0;
     else begin
       case (state)
@@ -358,7 +358,7 @@ module poly2mono #(
   end
 
   always @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       note_vel_out <= 7'd0;
     else begin
       case (state)

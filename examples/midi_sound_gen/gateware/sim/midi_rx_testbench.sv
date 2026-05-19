@@ -10,9 +10,9 @@ module midi_rx_testbench;
   parameter CLK_CYCLE = 2;
   localparam FREQ_SYSCLK = 16, BAUDRATE = 1;  // for simulation
 
-  integer i;
+  int i;
 
-  logic clk, reset_n;
+  logic clk, resetn;
 
   logic uart_tx_out, uart_tx_valid, uart_tx_ready;
   logic [7:0] uart_tx_d_in;
@@ -26,7 +26,7 @@ module midi_rx_testbench;
     .BAUDRATE    (BAUDRATE   )
   ) uart_tx_inst (
     .clk     (clk          ),
-    .reset_n (reset_n      ),
+    .resetn  (resetn       ),
     .tx_out  (uart_tx_out  ),
     .valid   (uart_tx_valid),
     .ready   (uart_tx_ready),
@@ -40,7 +40,7 @@ module midi_rx_testbench;
     .MAX_VOICE      (4          )
   ) midi_rx_inst (
     .clk       (clk        ),
-    .reset_n   (reset_n    ),
+    .resetn    (resetn     ),
     .midi_in   (uart_tx_out),
     .bus_A     (bus_A      ),
     .bus_D_out (bus_D_out  )
@@ -49,9 +49,9 @@ module midi_rx_testbench;
   task update_input (
     input byte data[]
   );
-    integer i;
+    int i;
     $write("   input: ");
-    for (i = 0; i < data.size(); i = i + 1) begin
+    for (i = 0; i < data.size(); i++) begin
       @(posedge clk);
       wait(uart_tx_ready);
       uart_tx_valid <= 1'b1;
@@ -90,11 +90,11 @@ module midi_rx_testbench;
     uart_tx_d_in <= 8'h00;
     uart_tx_valid <= 1'b0;
     bus_A <= 8'h00;
-    reset_n <= 1'b0;
+    resetn <= 1'b0;
     fail <= 1'b0;
 
     repeat (10) @(posedge clk);
-    reset_n <= 1'b1;
+    resetn <= 1'b1;
     repeat (10) @(posedge clk);
 
     $display("Check note on");
@@ -124,8 +124,8 @@ module midi_rx_testbench;
     for (i = 0; i < 4; i++) begin
       update_input('{{4'hE, 2'b00, i[1:0]}, 8'h10 + i[7:0], 8'h20 + i[7:0]});
       wait(midi_rx_inst.v_valid);
-      check_output(.addr({i[1:0], 1'b0, 3'd4}), .dout({7'h20 + i[6:0], 7'h10 + i[6:0]}));
-      check_output(.addr({i[1:0], 1'b0, 3'd5}), .dout((7'h20 + i[6:0]) >> 1));
+      check_output(.addr({i[1:0], 1'b0, 3'd4}), .dout(8'({7'h20 + i[6:0], 7'h10 + i[6:0]})));
+      check_output(.addr({i[1:0], 1'b0, 3'd5}), .dout(8'((7'h20 + i[6:0]) >> 1)));
     end
 
     repeat (10) @(posedge clk);

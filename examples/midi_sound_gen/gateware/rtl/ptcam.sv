@@ -6,7 +6,7 @@ module ptcam #(
   localparam AWIDTH = $clog2(DEPTH)
 )(
   input  logic              clk,
-  input  logic              reset_n,
+  input  logic              resetn,
 
   input  logic [AWIDTH-1:0] w_addr,      // Write address
   input  logic [DWIDTH-1:0] w_din,       // Write data input
@@ -25,7 +25,7 @@ module ptcam #(
   output logic              s_notfound   // Search result not found
 );
 
-  integer i;
+  int i;
 
   logic [DWIDTH-1:0] mem [0:DEPTH-1];
   logic [DWIDTH-1:0] s_din_str, s_mask_str;
@@ -44,8 +44,8 @@ module ptcam #(
   t_state state;
 
   always_ff @(posedge clk) begin
-    for (i=0; i<DEPTH; i=i+1) begin
-      if (~reset_n)
+    for (i = 0; i < DEPTH; i++) begin
+      if (~resetn)
         mem[i] <= 'd0;
       else
         mem[i] <= w_en & (w_addr == i) ? (w_din & w_mask) | (mem[i] & ~w_mask) : mem[i];
@@ -56,7 +56,7 @@ module ptcam #(
     r_dout <= mem[r_addr];
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       state <= S_IDLE;
     else begin
       case (state)

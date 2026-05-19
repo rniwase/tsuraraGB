@@ -6,7 +6,7 @@ module uart_rx #(
   parameter BAUDRATE       = 31250      // UART Baud rate
 )(
   input  logic       clk,      // System clock input
-  input  logic       reset_n,  // Reset input
+  input  logic       resetn,  // Reset input
   input  logic       rx_in,    // UART RX input
   output logic       valid,    // Data valid output
   output logic [7:0] d_out,    // Data output
@@ -34,7 +34,7 @@ module uart_rx #(
     rx_buf <= {rx_buf[NUM_SYNC_STAGE-2:0], rx_in};
 
   always_ff @(posedge clk) begin
-    if (~reset_n)
+    if (~resetn)
       baudgen_valid <= 1'b0;
     else if (endofrx)
       baudgen_valid <= 1'b0;
