@@ -49,7 +49,7 @@ module midi_rx #(
     .NUM_SYNC_STAGE (NUM_SYNC_STAGE),
     .FREQ_SYSCLK    (FREQ_SYSCLK   ),
     .BAUDRATE       (BAUDRATE      )
-  ) uart_rx_i (
+  ) uart_rx_inst (
     .clk            (clk           ),
     .resetn         (resetn        ),
     .rx_in          (midi_in       ),

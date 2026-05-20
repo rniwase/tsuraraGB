@@ -18,7 +18,7 @@ module bidir_pad #(
         .PULLUP            (       1'b0),
         .NEG_TRIGGER       (       1'b0),
         .IO_STANDARD       ("SB_LVCMOS")
-      ) SB_IO_i (
+      ) SB_IO_inst (
         .PACKAGE_PIN       (  pad[i]),
         .LATCH_INPUT_VALUE (    1'b0),
         .CLOCK_ENABLE      (    1'b1),
