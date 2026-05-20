@@ -77,7 +77,7 @@ module midi_rx #(
   );
 
   generate
-    for (j = 0; j < 4; j = j + 1) begin: gen_poly2mono
+    for (j = 0; j < 4; j++) begin: gen_poly2mono
       poly2mono #(
         .MAX_VOICE     (MAX_VOICE                 )
       ) poly2mono_inst (
