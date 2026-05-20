@@ -17,6 +17,16 @@ ifeq ($(UNAME_S),Linux)
 		GBDK_FNAME := gbdk-linux-arm64.tar.gz
 	endif
 endif
+ifeq ($(UNAME_S),Darwin)
+	ifeq ($(UNAME_M),x86_64)
+		OCS_FNAME := oss-cad-suite-darwin-x64-$(subst -,,$(OCS_REL)).tgz
+		GBDK_FNAME := gbdk-macos.tar.gz
+	endif
+	ifeq ($(UNAME_M),arm64)
+		OCS_FNAME := oss-cad-suite-darwin-arm64-$(subst -,,$(OCS_REL)).tgz
+		GBDK_FNAME := gbdk-macos-arm64.tar.gz
+	endif
+endif
 ifeq ($(OCS_FNAME),)
 	$(error unsupported OS: $(UNAME_S) $(UNAME_M))
 endif
@@ -35,12 +45,12 @@ prepare:
 	@ if [ ! -e $(DL_PATH)/oss-cad-suite ]; then \
 		echo "--- OSS CAD Suite not found. Downloading."; \
 		mkdir -p $(DL_PATH); \
-		wget -c $(OCS_URL) -O - | tar -xz -C $(DL_PATH); \
+		curl -L $(OCS_URL) | tar -xz -C $(DL_PATH); \
 	fi
 	@ if [ ! -e $(DL_PATH)/gbdk ]; then \
 		echo "--- GBDK not found. Downloading."; \
 		mkdir -p $(DL_PATH); \
-		wget -c $(GBDK_URL) -O - | tar -xz -C $(DL_PATH); \
+		curl -L $(GBDK_URL) | tar -xz -C $(DL_PATH); \
 	fi
 	@ if [ ! -e $(DL_PATH)/oss-cad-suite/lib/python3.11/site-packages/pyftdi ]; then \
 		echo "--- PyFtdi not found. Downloading."; \
