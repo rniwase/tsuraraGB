@@ -3,26 +3,38 @@
 #define CH0_NOTE_ACT    *( uint8_t *)0xB000U
 #define CH0_NOTE_NUM    *( uint8_t *)0xB001U
 #define CH0_NOTE_VEL    *( uint8_t *)0xB002U
-#define CH0_CC_VOL      *( uint8_t *)0xB003U
-#define CH0_PITCHBEND   *(uint16_t *)0xB004U
+#define CH0_CC_MODW     *( uint8_t *)0xB003U
+#define CH0_CC_VOL      *( uint8_t *)0xB004U
+#define CH0_CC_PAN      *( uint8_t *)0xB005U
+#define CH0_CC_GP1      *( uint8_t *)0xB006U
+#define CH0_PITCHBEND   *(uint16_t *)0xB00EU
 
 #define CH1_NOTE_ACT    *( uint8_t *)0xB010U
 #define CH1_NOTE_NUM    *( uint8_t *)0xB011U
 #define CH1_NOTE_VEL    *( uint8_t *)0xB012U
-#define CH1_CC_VOL      *( uint8_t *)0xB013U
-#define CH1_PITCHBEND   *(uint16_t *)0xB014U
+#define CH1_CC_MODW     *( uint8_t *)0xB013U
+#define CH1_CC_VOL      *( uint8_t *)0xB014U
+#define CH1_CC_PAN      *( uint8_t *)0xB015U
+#define CH1_CC_GP1      *( uint8_t *)0xB016U
+#define CH1_PITCHBEND   *(uint16_t *)0xB01EU
 
 #define CH2_NOTE_ACT    *( uint8_t *)0xB020U
 #define CH2_NOTE_NUM    *( uint8_t *)0xB021U
 #define CH2_NOTE_VEL    *( uint8_t *)0xB022U
-#define CH2_CC_VOL      *( uint8_t *)0xB023U
-#define CH2_PITCHBEND   *(uint16_t *)0xB024U
+#define CH2_CC_MODW     *( uint8_t *)0xB023U
+#define CH2_CC_VOL      *( uint8_t *)0xB024U
+#define CH2_CC_PAN      *( uint8_t *)0xB025U
+#define CH2_CC_GP1      *( uint8_t *)0xB026U
+#define CH2_PITCHBEND   *(uint16_t *)0xB02EU
 
 #define CH3_NOTE_ACT    *( uint8_t *)0xB030U
 #define CH3_NOTE_NUM    *( uint8_t *)0xB031U
 #define CH3_NOTE_VEL    *( uint8_t *)0xB032U
-#define CH3_CC_VOL      *( uint8_t *)0xB033U
-#define CH3_PITCHBEND   *(uint16_t *)0xB034U
+#define CH3_CC_MODW     *( uint8_t *)0xB033U
+#define CH3_CC_VOL      *( uint8_t *)0xB034U
+#define CH3_CC_PAN      *( uint8_t *)0xB035U
+#define CH3_CC_GP1      *( uint8_t *)0xB036U
+#define CH3_PITCHBEND   *(uint16_t *)0xB03EU
 
 #define MULT16x16_IN_A  *(uint16_t *)0xB800U
 #define MULT16x16_IN_B  *(uint16_t *)0xB802U

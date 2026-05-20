@@ -24,19 +24,26 @@ module midi_rx #(
   logic [ 6:0] v_note_num, v_note_vel, v_control_num, v_control_val;
   logic [13:0] v_pitchbend_val;
 
-  logic [ 6:0] note_num  [0:3];
-  logic [ 6:0] note_vel  [0:3];
-  logic [ 6:0] cc_volume [0:3];
-  logic [13:0] pitchbend [0:3];
+  logic [ 6:0] note_num    [0:3];
+  logic [ 6:0] note_vel    [0:3];
+  logic [ 6:0] cc_modwheel [0:3];  // CC  1
+  logic [ 6:0] cc_volume   [0:3];  // CC  7
+  logic [ 6:0] cc_pan      [0:3];  // CC 10
+  logic [ 6:0] cc_gp1      [0:3];  // CC 16
+  logic [13:0] pitchbend   [0:3];
 
   logic [ 3:0] all_notes_off;
-
   logic [ 3:0] ch_valid;
+  logic [ 1:0] bus_A_upper;
+  logic [ 3:0] bus_A_lower;
 
   always_comb begin
     for (i = 0; i < 4; i++)
-      ch_valid[i] = (v_channel == i);
+      ch_valid[i] = v_valid & (v_channel == i);
   end
+
+  assign bus_A_upper = bus_A[5:4];
+  assign bus_A_lower = bus_A[3:0];
 
   uart_rx #(
     .NUM_SYNC_STAGE (NUM_SYNC_STAGE),
@@ -90,56 +97,37 @@ module midi_rx #(
   endgenerate
 
   always_ff @(posedge clk) begin
-    if (~resetn) begin
-      for (i = 0; i < 4; i++)
-        cc_volume[i] <= 7'd127;
-    end
-    else if (v_valid & v_control & (v_control_num == 7'd7)) begin
-      for (i = 0; i < 4; i++)
-        cc_volume[i] <= ch_valid[i] ? v_control_val : cc_volume[i];
-    end
-    else begin
-      for (i = 0; i < 4; i++)
-        cc_volume[i] <= cc_volume[i];
-    end
-  end
-
-  always_ff @(posedge clk) begin
-    if (~resetn) begin
-      for (i = 0; i < 4; i++)
-        pitchbend[i] <= 14'd8192;
-    end
-    else if (v_valid & v_pitchbend) begin
-      for (i = 0; i < 4; i++)
-        pitchbend[i] <= ch_valid[i] ? v_pitchbend_val : pitchbend[i];
-    end
-    else begin
-      for (i = 0; i < 4; i++)
-        pitchbend[i] <= pitchbend[i];
-    end
-  end
-
-  always @(posedge clk) begin
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++) begin
+      if (~resetn) begin
+        cc_modwheel[i] <= 7'd0;
+        cc_volume[i]   <= 7'd127;
+        cc_pan[i]      <= 7'd64;
+        cc_gp1[i]      <= 7'd127;  // fix it
+        pitchbend[i]   <= 14'd8192;
+      end
+      else begin
+        cc_modwheel[i] <= (ch_valid[i] & v_control & (v_control_num ==  7'd1)) ? v_control_val : cc_modwheel[i];
+        cc_volume[i]   <= (ch_valid[i] & v_control & (v_control_num ==  7'd7)) ? v_control_val : cc_volume[i];
+        cc_pan[i]      <= (ch_valid[i] & v_control & (v_control_num == 7'd10)) ? v_control_val : cc_pan[i];
+        cc_gp1[i]      <= (ch_valid[i] & v_control & (v_control_num == 7'd16)) ? v_control_val : cc_gp1[i];
+        pitchbend[i]   <= (ch_valid[i] & v_pitchbend) ? v_pitchbend_val : pitchbend[i];
+      end
       all_notes_off[i] <= v_valid & ch_valid[i] & (v_control_num == 7'd123);
+    end
   end
 
   always_ff @(posedge clk) begin
-    case (bus_A[2:0])
-      3'h0:
-        bus_D_out <= {7'b0, note_act[bus_A[5:4]]};
-      3'h1:
-        bus_D_out <= {1'b0, note_num[bus_A[5:4]]};
-      3'h2:
-        bus_D_out <= {1'b0, note_act[bus_A[5:4]] ? note_vel[bus_A[5:4]] : 7'd0};
-      3'h3:
-        bus_D_out <= {1'b0, cc_volume[bus_A[5:4]]};
-      3'h4:
-        bus_D_out <= pitchbend[bus_A[5:4]][7:0];
-      3'h5:
-        bus_D_out <= {2'b00, pitchbend[bus_A[5:4]][13:8]};
-      default:
-        bus_D_out <= 8'h00;
+    case (bus_A_lower)
+      4'h0: bus_D_out <= {7'b0, note_act[bus_A_upper]};
+      4'h1: bus_D_out <= {1'b0, note_num[bus_A_upper]};
+      4'h2: bus_D_out <= {1'b0, note_act[bus_A_upper] ? note_vel[bus_A_upper] : 7'd0};
+      4'h3: bus_D_out <= {1'b0, cc_modwheel[bus_A_upper]};
+      4'h4: bus_D_out <= {1'b0, cc_volume[bus_A_upper]};
+      4'h5: bus_D_out <= {1'b0, cc_pan[bus_A_upper]};
+      4'h6: bus_D_out <= {1'b0, cc_gp1[bus_A_upper]};
+      4'hE: bus_D_out <= pitchbend[bus_A_upper][7:0];
+      4'hF: bus_D_out <= {2'b00, pitchbend[bus_A_upper][13:8]};
+      default: bus_D_out <= 8'h00;
     endcase
   end
 

@@ -101,31 +101,52 @@ module midi_rx_testbench;
     for (i = 0; i < 4; i++) begin
       update_input('{{4'h9, 2'b00, i[1:0]}, 8'h40 + i[7:0], 8'h70 + i[7:0]});
       wait(midi_rx_inst.v_valid);
-      check_output(.addr({i[1:0], 1'b0, 3'd0}), .dout({7'd0, 1'b1}));
-      check_output(.addr({i[1:0], 1'b0, 3'd1}), .dout({1'b0, 7'h40 + i[7:0]}));
-      check_output(.addr({i[1:0], 1'b0, 3'd2}), .dout({1'b0, 7'h70 + i[7:0]}));
+      check_output(.addr({i[1:0], 4'h0}), .dout({7'd0, 1'b1}));
+      check_output(.addr({i[1:0], 4'h1}), .dout({1'b0, 7'h40 + i[7:0]}));
+      check_output(.addr({i[1:0], 4'h2}), .dout({1'b0, 7'h70 + i[7:0]}));
     end
 
     $display("Check note off");
     for (i = 0; i < 4; i++) begin
       update_input('{{4'h8, 2'b00, i[1:0]}, 8'h40 + i[7:0], 8'h00});
       wait(midi_rx_inst.v_valid);
-      check_output(.addr({i[1:0], 1'b0, 3'd0}), .dout({7'd0, 1'b0}));
+      check_output(.addr({i[1:0], 4'h0}), .dout({7'd0, 1'b0}));
+    end
+
+    $display("Check modulation wheel (CC1)");
+    for (i = 0; i < 4; i++) begin
+      update_input('{{4'hB, 2'b00, i[1:0]}, 8'h01, 8'h70 + i[7:0]});
+      wait(midi_rx_inst.v_valid);
+      check_output(.addr({i[1:0], 4'h3}), .dout({1'b0, 7'h70 + i[7:0]}));
     end
 
     $display("Check volume (CC7)");
     for (i = 0; i < 4; i++) begin
       update_input('{{4'hB, 2'b00, i[1:0]}, 8'h07, 8'h70 + i[7:0]});
       wait(midi_rx_inst.v_valid);
-      check_output(.addr({i[1:0], 1'b0, 3'd3}), .dout({1'b0, 7'h70 + i[7:0]}));
+      check_output(.addr({i[1:0], 4'h4}), .dout({1'b0, 7'h70 + i[7:0]}));
+    end
+
+    $display("Check pan (CC10)");
+    for (i = 0; i < 4; i++) begin
+      update_input('{{4'hB, 2'b00, i[1:0]}, 8'h0A, 8'h70 + i[7:0]});
+      wait(midi_rx_inst.v_valid);
+      check_output(.addr({i[1:0], 4'h5}), .dout({1'b0, 7'h70 + i[7:0]}));
+    end
+
+    $display("Check general purpose control 1 (CC16)");
+    for (i = 0; i < 4; i++) begin
+      update_input('{{4'hB, 2'b00, i[1:0]}, 8'h10, 8'h70 + i[7:0]});
+      wait(midi_rx_inst.v_valid);
+      check_output(.addr({i[1:0], 4'h6}), .dout({1'b0, 7'h70 + i[7:0]}));
     end
 
     $display("Check pitchbend");
     for (i = 0; i < 4; i++) begin
       update_input('{{4'hE, 2'b00, i[1:0]}, 8'h10 + i[7:0], 8'h20 + i[7:0]});
       wait(midi_rx_inst.v_valid);
-      check_output(.addr({i[1:0], 1'b0, 3'd4}), .dout(8'({7'h20 + i[6:0], 7'h10 + i[6:0]})));
-      check_output(.addr({i[1:0], 1'b0, 3'd5}), .dout(8'((7'h20 + i[6:0]) >> 1)));
+      check_output(.addr({i[1:0], 4'hE}), .dout(8'({7'h20 + i[6:0], 7'h10 + i[6:0]})));
+      check_output(.addr({i[1:0], 4'hF}), .dout(8'((7'h20 + i[6:0]) >> 1)));
     end
 
     repeat (10) @(posedge clk);
