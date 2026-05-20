@@ -1,15 +1,15 @@
 PROJ = multiplier_demo
 TOP = cartridge_top
 SRCS = \
-	../../common/gateware/rtl/led_driver.sv \
-	../../common/gateware/rtl/bidir_pad.sv \
-	../../common/gateware/rtl/spi_master.sv \
-	../../common/gateware/rtl/flash2spram.sv \
-	../../common/gateware/rtl/SP256K_4x.sv \
-	../../common/gateware/rtl/pipe_buf.sv \
-	../../common/gateware/rtl/reset_gen.sv \
-	../../common/gateware/rtl/mac.sv \
-	./rtl/cartridge_top.sv
+  ../../common/gateware/rtl/led_driver.sv \
+  ../../common/gateware/rtl/bidir_pad.sv \
+  ../../common/gateware/rtl/spi_master.sv \
+  ../../common/gateware/rtl/flash2spram.sv \
+  ../../common/gateware/rtl/SP256K_4x.sv \
+  ../../common/gateware/rtl/pipe_buf.sv \
+  ../../common/gateware/rtl/reset_gen.sv \
+  ../../common/gateware/rtl/mac.sv \
+  ./rtl/cartridge_top.sv
 PCF = ../../common/gateware/pin.pcf
 OCSBIN = ../../downloads/oss-cad-suite/bin
 YOSYS = $(OCSBIN)/yosys

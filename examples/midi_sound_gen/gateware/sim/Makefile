@@ -1,8 +1,8 @@
 SIMS = \
-	ptcam_testbench.vcd \
-	poly2mono_testbench.vcd \
-	midi_parser_testbench.vcd \
-	midi_rx_testbench.vcd
+  ptcam_testbench.vcd \
+  poly2mono_testbench.vcd \
+  midi_parser_testbench.vcd \
+  midi_rx_testbench.vcd
 
 IVERILOG = ../../../downloads/oss-cad-suite/bin/iverilog
 VVP = ../../../downloads/oss-cad-suite/bin/vvp

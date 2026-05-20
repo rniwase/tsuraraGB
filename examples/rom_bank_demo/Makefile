@@ -13,16 +13,16 @@ prepare:
 
 build:
 	@ for d in $(SUBDIRS); do \
-		cd $$d; \
-		$(MAKE); \
-		cd ..; \
+	  cd $$d; \
+	  $(MAKE); \
+	  cd ..; \
 	done
 
 clean:
 	@ for d in $(SUBDIRS); do \
-		cd $$d; \
-		$(MAKE) $@; \
-		cd ..; \
+	  cd $$d; \
+	  $(MAKE) $@; \
+	  cd ..; \
 	done
 
 flash: prepare
