@@ -24,7 +24,7 @@ all: prepare build
 
 prepare:
 	@ cd ../../; \
-	$(MAKE) prepare
+	$(MAKE) $@
 
 build: $(PROJ).bin $(PROJ).rpt
 

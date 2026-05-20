@@ -9,12 +9,12 @@ all: build
 
 prepare:
 	@ cd ../; \
-	$(MAKE) prepare
+	$(MAKE) $@
 
 build:
 	@ for d in $(SUBDIRS); do \
 	  cd $$d; \
-	  $(MAKE); \
+	  $(MAKE) $@; \
 	  cd ..; \
 	done
 

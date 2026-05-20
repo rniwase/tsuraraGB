@@ -33,7 +33,7 @@ all: prepare build
 
 prepare:
 	@ cd ../../; \
-	$(MAKE) prepare
+	$(MAKE) $@
 
 build: meminit_nrfreq_table.svh $(PROJ).bin $(PROJ).rpt
 

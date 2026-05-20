@@ -58,7 +58,7 @@ prepare:
 build:
 	@ for d in $(SUBDIRS); do \
 	  cd $$d; \
-	  $(MAKE); \
+	  $(MAKE) $@; \
 	  cd ..; \
 	done
 

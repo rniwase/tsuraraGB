@@ -9,7 +9,7 @@ all: prepare build
 
 prepare:
 	@ cd ../../; \
-	$(MAKE) prepare
+	$(MAKE) $@
 
 build: $(PROJ).gb
 
