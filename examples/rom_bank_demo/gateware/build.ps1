@@ -1,0 +1,94 @@
+param(
+    [ValidateSet("all", "prepare", "build", "clean")]
+    [string]$target = "all"
+)
+
+$ErrorActionPreference = "Stop"
+
+$PROJ = "rom_bank_demo"
+$TOP = "cartridge_top"
+
+$SRCS = @(
+    "..\..\common\gateware\rtl\led_driver.sv",
+    "..\..\common\gateware\rtl\bidir_pad.sv",
+    "..\..\common\gateware\rtl\spi_master.sv",
+    "..\..\common\gateware\rtl\flash2spram.sv",
+    "..\..\common\gateware\rtl\SP256K_4x.sv",
+    "..\..\common\gateware\rtl\pipe_buf.sv",
+    "..\..\common\gateware\rtl\reset_gen.sv",
+    ".\rtl\cartridge_top.sv"
+)
+
+$PCF = "..\..\common\gateware\pin.pcf"
+
+$OCSENV  = "..\..\downloads\oss-cad-suite\environment.ps1"
+$YOSYS = "yosys.exe"
+$NEXTPNR = "nextpnr-ice40.exe"
+$ICEPACK = "icepack.exe"
+$ICETIME = "icetime.exe"
+
+$JSON = "$PROJ.json"
+$ASC = "$PROJ.asc"
+$BIN = "$PROJ.bin"
+$RPT = "$PROJ.rpt"
+
+$PS = "powershell.exe"
+
+function target_prepare {
+    Push-Location "..\..\"
+    try {
+        & $PS .\build.ps1 prepare
+        if ($LASTEXITCODE -ne 0) {
+            throw "prepare failed"
+        }
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function target_build {
+    . $OCSENV
+
+    & $YOSYS -p "synth_ice40 -top $TOP -json $JSON" $SRCS
+    if ($LASTEXITCODE -ne 0) {
+        throw "build failed while running yosys"
+    }
+
+    & $NEXTPNR --up5k --package sg48 --asc $ASC --pcf $PCF --json $JSON
+    if ($LASTEXITCODE -ne 0) {
+        throw "build failed while running nextpnr"
+    }
+
+    & $ICEPACK $ASC $BIN
+    if ($LASTEXITCODE -ne 0) {
+        throw "build failed while running icepack"
+    }
+
+    & $ICETIME -d up5k -mtr $RPT $ASC
+    if ($LASTEXITCODE -ne 0) {
+        throw "build failed while running icetime"
+    }
+}
+
+function target_clean {
+    @("*.bin", "*.json", "*.asc", "*.rpt") | ForEach-Object {
+        Remove-Item $_ -Force -ErrorAction SilentlyContinue
+    }
+}
+
+switch ($target) {
+    "prepare" {
+        target_prepare
+    }
+    "build" {
+        target_build
+    }
+    "clean" {
+        target_clean
+    }
+    "all" {
+        target_prepare
+        target_build
+    }
+}
