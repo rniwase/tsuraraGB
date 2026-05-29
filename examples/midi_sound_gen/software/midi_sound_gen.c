@@ -16,6 +16,7 @@ typedef struct {
   uint8_t amp;
   uint8_t amp_prv;
   uint8_t act;
+  uint8_t out;
 } NR;
 
 NR nr[4];
@@ -290,6 +291,10 @@ void main(void) {
   nr[1].act = 0;
   nr[2].act = 0;
   nr[3].act = 0;
+  nr[0].out = 3;
+  nr[1].out = 3;
+  nr[2].out = 3;
+  nr[3].out = 3;
 
   NR52_REG = 0x80;  // Enable sound
   NR50_REG = 0x77;  // Set master volume
@@ -309,18 +314,20 @@ void main(void) {
 
   gotoxy(0, 0);
   printf(  // 20x18
-    "MIDI Sound Generator"
-    "                    "
     "MIDI CH0 CH1 CH2 CH3"
     "Act   --  --  --  --"
     "Nt#   --  --  --  --"
     "Vel   --  --  --  --"
     "PB  ----------------"
-    "CC7   --  --  --  --"
+    "Mod   --  --  --  --"
+    "Vol   --  --  --  --"
+    "Pan   --  --  --  --"
+    "GP1   --  --  --  --"
     "                    "
     "NR   Sq1 Sq2 Wav Noi"
     "Frq  --- --- --- ---"
     "Amp    -   -   -   -"
+    "Out   --  --  --  --"
   );
 
   CRITICAL {
@@ -333,39 +340,63 @@ void main(void) {
   set_interrupts(TIM_IFLAG);  // Handle TIM interrupts
 
   while (1) {
-    gotoxy( 6,  3); printf(CH0_NOTE_ACT ? "ON" : "--");
-    gotoxy(10,  3); printf(CH1_NOTE_ACT ? "ON" : "--");
-    gotoxy(14,  3); printf(CH2_NOTE_ACT ? "ON" : "--");
-    gotoxy(18,  3); printf(CH3_NOTE_ACT ? "ON" : "--");
+    gotoxy( 6,  1); printf(CH0_NOTE_ACT ? "ON" : "--");
+    gotoxy(10,  1); printf(CH1_NOTE_ACT ? "ON" : "--");
+    gotoxy(14,  1); printf(CH2_NOTE_ACT ? "ON" : "--");
+    gotoxy(18,  1); printf(CH3_NOTE_ACT ? "ON" : "--");
 
-    gotoxy( 6,  4); printhex8(CH0_NOTE_NUM);
-    gotoxy(10,  4); printhex8(CH1_NOTE_NUM);
-    gotoxy(14,  4); printhex8(CH2_NOTE_NUM);
-    gotoxy(18,  4); printhex8(CH3_NOTE_NUM);
+    gotoxy( 6,  2); printhex8(CH0_NOTE_NUM);
+    gotoxy(10,  2); printhex8(CH1_NOTE_NUM);
+    gotoxy(14,  2); printhex8(CH2_NOTE_NUM);
+    gotoxy(18,  2); printhex8(CH3_NOTE_NUM);
 
-    gotoxy( 6,  5); printhex8(CH0_NOTE_VEL);
-    gotoxy(10,  5); printhex8(CH1_NOTE_VEL);
-    gotoxy(14,  5); printhex8(CH2_NOTE_VEL);
-    gotoxy(18,  5); printhex8(CH3_NOTE_VEL);
+    gotoxy( 6,  3); printhex8(CH0_NOTE_VEL);
+    gotoxy(10,  3); printhex8(CH1_NOTE_VEL);
+    gotoxy(14,  3); printhex8(CH2_NOTE_VEL);
+    gotoxy(18,  3); printhex8(CH3_NOTE_VEL);
 
-    gotoxy( 4,  6); printhex16(CH0_PITCHBEND);
-    gotoxy( 8,  6); printhex16(CH1_PITCHBEND);
-    gotoxy(12,  6); printhex16(CH2_PITCHBEND);
-    gotoxy(16,  6); printhex16(CH3_PITCHBEND);
+    gotoxy( 4,  4); printhex16(CH0_PITCHBEND);
+    gotoxy( 8,  4); printhex16(CH1_PITCHBEND);
+    gotoxy(12,  4); printhex16(CH2_PITCHBEND);
+    gotoxy(16,  4); printhex16(CH3_PITCHBEND);
 
-    gotoxy( 6,  7); printhex8(CH0_CC_VOL);
-    gotoxy(10,  7); printhex8(CH1_CC_VOL);
-    gotoxy(14,  7); printhex8(CH2_CC_VOL);
-    gotoxy(18,  7); printhex8(CH3_CC_VOL);
+    gotoxy( 6,  5); printhex8(CH0_CC_MODW);
+    gotoxy(10,  5); printhex8(CH1_CC_MODW);
+    gotoxy(14,  5); printhex8(CH2_CC_MODW);
+    gotoxy(18,  5); printhex8(CH3_CC_MODW);
 
-    gotoxy( 5, 10); printhex12(nr[0].frq);
-    gotoxy( 9, 10); printhex12(nr[1].frq);
-    gotoxy(13, 10); printhex12(nr[2].frq);
-    gotoxy(17, 10); printhex12(nr[3].frq);
+    gotoxy( 6,  6); printhex8(CH0_CC_VOL);
+    gotoxy(10,  6); printhex8(CH1_CC_VOL);
+    gotoxy(14,  6); printhex8(CH2_CC_VOL);
+    gotoxy(18,  6); printhex8(CH3_CC_VOL);
 
-    gotoxy( 7, 11); printhex4(nr[0].amp);
-    gotoxy(11, 11); printhex4(nr[1].amp);
-    gotoxy(15, 11); printhex4(nr[2].amp);
-    gotoxy(19, 11); printhex4(nr[3].amp);
+    gotoxy( 6,  7); printhex8(CH0_CC_PAN);
+    gotoxy(10,  7); printhex8(CH1_CC_PAN);
+    gotoxy(14,  7); printhex8(CH2_CC_PAN);
+    gotoxy(18,  7); printhex8(CH3_CC_PAN);
+
+    gotoxy( 6,  8); printhex8(CH0_CC_GP1);
+    gotoxy(10,  8); printhex8(CH1_CC_GP1);
+    gotoxy(14,  8); printhex8(CH2_CC_GP1);
+    gotoxy(18,  8); printhex8(CH3_CC_GP1);
+
+    gotoxy( 5, 11); printhex12(nr[0].frq);
+    gotoxy( 9, 11); printhex12(nr[1].frq);
+    gotoxy(13, 11); printhex12(nr[2].frq);
+    gotoxy(17, 11); printhex12(nr[3].frq);
+
+    gotoxy( 7, 12); printhex4(nr[0].amp);
+    gotoxy(11, 12); printhex4(nr[1].amp);
+    gotoxy(15, 12); printhex4(nr[2].amp);
+    gotoxy(19, 12); printhex4(nr[3].amp);
+
+    gotoxy( 6, 13); printf(((nr[0].out & 0x02) == 0x02) ? "L" : "-");
+                    printf(((nr[0].out & 0x01) == 0x01) ? "R" : "-");
+    gotoxy(10, 13); printf(((nr[1].out & 0x02) == 0x02) ? "L" : "-");
+                    printf(((nr[1].out & 0x01) == 0x01) ? "R" : "-");
+    gotoxy(14, 13); printf(((nr[2].out & 0x02) == 0x02) ? "L" : "-");
+                    printf(((nr[2].out & 0x01) == 0x01) ? "R" : "-");
+    gotoxy(18, 13); printf(((nr[3].out & 0x02) == 0x02) ? "L" : "-");
+                    printf(((nr[3].out & 0x01) == 0x01) ? "R" : "-");
   }
 }
