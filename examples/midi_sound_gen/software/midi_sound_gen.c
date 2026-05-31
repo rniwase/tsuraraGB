@@ -17,6 +17,7 @@ typedef struct {
   uint8_t amp_prv;
   uint8_t act;
   uint8_t out;
+  uint8_t duty;
 } NR;
 
 NR nr[4];
@@ -208,6 +209,8 @@ void update_sound(void) {
   nr[0].frq = tgb_nrfreq(((uint16_t)CH0_NOTE_NUM << 9) + ((int16_t)(CH0_PITCHBEND - 8192) >> 3));
   nr[0].amp = tgb_mult16x16(CH0_NOTE_VEL, CH0_CC_VOL) >> 10;
   nr[0].act = (nr[0].amp_prv == 0) & (nr[0].amp != 0);
+  nr[0].out = (CH0_CC_PAN < 96) | ((CH0_CC_PAN >= 32) << 4);
+  nr[0].duty = CH0_CC_GP1 >> 5;
 
   if (nr[0].act) {
     NR12_REG = ((0xF & nr[0].amp) << 4) | 0x08;
@@ -220,6 +223,7 @@ void update_sound(void) {
     }
   }
 
+  NR11_REG = nr[0].duty << 6;
   NR13_REG = (uint8_t)nr[0].frq;
   NR14_REG = (nr[0].act << 7) | (*((uint8_t *)(&nr[0].frq) + 1));
 
@@ -227,6 +231,8 @@ void update_sound(void) {
   nr[1].frq = tgb_nrfreq(((uint16_t)CH1_NOTE_NUM << 9) + ((int16_t)(CH1_PITCHBEND - 8192) >> 3));
   nr[1].amp = tgb_mult16x16(CH1_NOTE_VEL, CH1_CC_VOL) >> 10;
   nr[1].act = (nr[1].amp_prv == 0) & (nr[1].amp != 0);
+  nr[1].out = (CH1_CC_PAN < 96) | ((CH1_CC_PAN >= 32) << 4);
+  nr[1].duty = CH1_CC_GP1 >> 5;
 
   if (nr[1].act) {
     NR22_REG = ((0xF & nr[1].amp) << 4) | 0x08;
@@ -239,12 +245,14 @@ void update_sound(void) {
     }
   }
 
+  NR21_REG = nr[1].duty << 6;
   NR23_REG = (uint8_t)nr[1].frq;
   NR24_REG = (nr[1].act << 7) | (*((uint8_t *)(&nr[1].frq) + 1));
 
   // MIDI CH 2 -> NR3 Wave
   nr[2].frq = tgb_nrfreq(((uint16_t)CH2_NOTE_NUM << 9) + ((int16_t)(CH2_PITCHBEND - 8192) >> 3));
   nr[2].amp = tgb_mult16x16(CH2_NOTE_VEL, CH2_CC_VOL) >> 12;
+  nr[2].out = (CH2_CC_PAN < 96) | ((CH2_CC_PAN >= 32) << 4);
 
   NR32_REG = (4 - nr[2].amp) << 5;
   NR33_REG = (uint8_t)nr[2].frq;
@@ -254,6 +262,7 @@ void update_sound(void) {
   nr[3].frq = tgb_nrfreq(((uint16_t)CH3_NOTE_NUM << 9) + ((int16_t)(CH3_PITCHBEND - 8192) >> 3));  // FIX IT
   nr[3].amp = tgb_mult16x16(CH3_NOTE_VEL, CH3_CC_VOL) >> 10;
   nr[3].act = (nr[3].amp_prv == 0) & (nr[3].amp != 0);
+  nr[3].out = (CH3_CC_PAN < 96) | ((CH3_CC_PAN >= 32) << 4);
 
   if (nr[3].act) {
     NR42_REG = ((0xF & nr[3].amp) << 4) | 0x08;
@@ -268,6 +277,8 @@ void update_sound(void) {
 
   NR43_REG = (uint8_t)nr[3].frq;  // FIX IT
   NR44_REG = nr[3].act << 7;
+
+  NR51_REG = (nr[3].out << 3) | (nr[2].out << 2) | (nr[1].out << 1) | nr[0].out;
 
   nr[0].amp_prv = nr[0].amp;
   nr[1].amp_prv = nr[1].amp;
@@ -328,6 +339,7 @@ void main(void) {
     "Frq  --- --- --- ---"
     "Amp    -   -   -   -"
     "Out   --  --  --  --"
+    "Duty   -   -   -   -"
   );
 
   CRITICAL {
@@ -390,13 +402,18 @@ void main(void) {
     gotoxy(15, 12); printhex4(nr[2].amp);
     gotoxy(19, 12); printhex4(nr[3].amp);
 
-    gotoxy( 6, 13); printf(((nr[0].out & 0x02) == 0x02) ? "L" : "-");
-                    printf(((nr[0].out & 0x01) == 0x01) ? "R" : "-");
-    gotoxy(10, 13); printf(((nr[1].out & 0x02) == 0x02) ? "L" : "-");
-                    printf(((nr[1].out & 0x01) == 0x01) ? "R" : "-");
-    gotoxy(14, 13); printf(((nr[2].out & 0x02) == 0x02) ? "L" : "-");
-                    printf(((nr[2].out & 0x01) == 0x01) ? "R" : "-");
-    gotoxy(18, 13); printf(((nr[3].out & 0x02) == 0x02) ? "L" : "-");
-                    printf(((nr[3].out & 0x01) == 0x01) ? "R" : "-");
+    gotoxy( 6, 13); printf(((nr[0].out & 0x01) == 0x01) ? "L" : "-");
+                    printf(((nr[0].out & 0x10) == 0x10) ? "R" : "-");
+    gotoxy(10, 13); printf(((nr[1].out & 0x01) == 0x01) ? "L" : "-");
+                    printf(((nr[1].out & 0x10) == 0x10) ? "R" : "-");
+    gotoxy(14, 13); printf(((nr[2].out & 0x01) == 0x01) ? "L" : "-");
+                    printf(((nr[2].out & 0x10) == 0x10) ? "R" : "-");
+    gotoxy(18, 13); printf(((nr[3].out & 0x01) == 0x01) ? "L" : "-");
+                    printf(((nr[3].out & 0x10) == 0x10) ? "R" : "-");
+
+    gotoxy( 7, 14); printhex4(nr[0].duty);
+    gotoxy(11, 14); printhex4(nr[1].duty);
+    gotoxy(15, 14); printhex4(nr[2].duty);
+    gotoxy(19, 14); printhex4(nr[3].duty);
   }
 }
