@@ -1,0 +1,238 @@
+(footprint "VSSOP-8_2.3x2mm_P0.5mm"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "VSSOP-8 2.3x2mm Pitch 0.5mm")
+	(tags "VSSOP-8 2.3x2mm Pitch 0.5mm")
+	(property "Reference" "U2"
+		(at 0 -1.75 180)
+		(layer "F.SilkS")
+		(uuid "3099eb6c-5cbc-4b80-b93b-7955d0fcb38f")
+		(effects
+			(font
+				(size 0.6 0.6)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Value" "TC7WZ07FK"
+		(at 0 2.2 180)
+		(layer "F.Fab")
+		(uuid "55132960-0db6-487b-ade3-7a8124afdaf3")
+		(effects
+			(font
+				(size 0.6 0.6)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 180)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "a7cde4e3-5de6-41ab-9910-7a92db181907")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "CMOS triple buffer (open drain) with 5V tolerant inputs"
+		(at 0 0 180)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "9f9dfb49-2b25-4815-8a44-95872c8c7a4e")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property ki_fp_filters "SOIC*3.9x8.7mm*P1.27mm* TSSOP*4.4x5mm*P0.65mm* DIP*W7.62mm*")
+	(sheetname "/")
+	(sheetfile "tGB-midi.kicad_sch")
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start 1.1 -1.1)
+		(end -1.9 -1.1)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "5610ebe7-5e9f-4900-ae03-464a55c6586d")
+	)
+	(fp_line
+		(start 1.1 1.1)
+		(end -1.1 1.1)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "20873ee3-6425-4f33-ad50-2dfa1982d036")
+	)
+	(fp_line
+		(start -2.25 -1.25)
+		(end 2.25 -1.25)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "06332a2f-d592-47cf-a4c2-3f477f161fdd")
+	)
+	(fp_line
+		(start -2.25 1.25)
+		(end -2.25 -1.25)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "4fb9644b-2c11-4942-811f-85e53455ab2a")
+	)
+	(fp_line
+		(start 2.25 -1.25)
+		(end 2.25 1.25)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "774a895c-4239-4822-8bbd-9c31d12c9ea2")
+	)
+	(fp_line
+		(start 2.25 1.25)
+		(end -2.25 1.25)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "364fc32f-93fa-4174-bc8d-be66976dcb90")
+	)
+	(fp_line
+		(start -1.15 1)
+		(end -1.15 -0.45)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "1ca3eea9-96c3-4577-83c4-e1b1991ffa5f")
+	)
+	(fp_line
+		(start -0.6 -1)
+		(end -1.15 -0.45)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "8a0602a4-4f0f-460e-8419-6d67ffc562e3")
+	)
+	(fp_line
+		(start -0.6 -1)
+		(end 1.15 -1)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "2131d641-8fc4-413a-9cd3-861b656766f3")
+	)
+	(fp_line
+		(start 1.15 -1)
+		(end 1.15 1)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "42b6bebf-2a71-4908-87fd-89d0aae49a52")
+	)
+	(fp_line
+		(start 1.15 1)
+		(end -1.15 1)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "e1f2e9ee-e045-4011-8071-f9cce90fe2d1")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 180)
+		(layer "F.Fab")
+		(uuid "1ce7b7be-29dd-49bb-bb7e-706b4d731a93")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.1)
+			)
+		)
+	)
+	(pad "1" smd rect
+		(at -1.55 -0.75 270)
+		(size 0.3 0.8)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "d997fcb4-8bd9-4e96-b54a-b48f4f53805b")
+	)
+	(pad "2" smd rect
+		(at -1.55 -0.25 270)
+		(size 0.3 0.8)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "cc9a7ec7-0978-40e5-bc56-416ae54cab9d")
+	)
+	(pad "3" smd rect
+		(at -1.55 0.25 270)
+		(size 0.3 0.8)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "9eba4c86-8467-418d-9a6b-4ac59cd85c0d")
+	)
+	(pad "4" smd rect
+		(at -1.55 0.75 270)
+		(size 0.3 0.8)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "aea0a131-778c-481b-8317-610ff3ace2fc")
+	)
+	(pad "5" smd rect
+		(at 1.55 0.75 270)
+		(size 0.3 0.8)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "61963a46-b7ef-446d-8f7b-0fed13ea115a")
+	)
+	(pad "6" smd rect
+		(at 1.55 0.25 270)
+		(size 0.3 0.8)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "20ac6a2b-82a7-40bc-a1dc-07a27b3b7f14")
+	)
+	(pad "7" smd rect
+		(at 1.55 -0.25 270)
+		(size 0.3 0.8)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "df913da6-7572-4e2b-ab10-14f802629139")
+	)
+	(pad "8" smd rect
+		(at 1.55 -0.75 270)
+		(size 0.3 0.8)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "1ca220dd-286e-4be6-b3bb-e2eb898724dc")
+	)
+	(embedded_fonts no)
+	(model "${KICAD10_3DMODEL_DIR}/Package_SO.3dshapes/VSSOP-8_2.3x2mm_P0.5mm.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

@@ -1,0 +1,179 @@
+(footprint "MJ-8435"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 0 16 0)
+		(layer "F.SilkS")
+		(uuid "ee3b5158-4a55-4d0b-a8e7-ab2119c91e77")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "MJ-8435"
+		(at 0 17.5 0)
+		(layer "F.Fab")
+		(uuid "e12ecb06-052e-4903-aac3-0d8d22d06e3d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "2aaa1a14-fc7d-4071-8cca-f6c79022afca")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "54d78e0a-5023-4d49-b8e8-e9a59bdf67c7")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -3 6.5)
+		(end -3 2.8)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "ced565c4-40e9-4204-8b80-dc6bc222be82")
+	)
+	(fp_line
+		(start -3 12)
+		(end -3 9.5)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "ea9a6dd5-b734-4a99-880f-a706ba52fe54")
+	)
+	(fp_line
+		(start 0.9 14)
+		(end -0.9 14)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "dbf52253-cf2f-4d72-bfa6-dac0a22d1ee9")
+	)
+	(fp_line
+		(start 3 6.5)
+		(end 3 2.8)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "583b5c50-3a6b-47a6-a165-11824a7ac856")
+	)
+	(fp_line
+		(start 3 12)
+		(end 3 9.5)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "8e840385-fd28-45e8-a615-7b25567ed76f")
+	)
+	(fp_line
+		(start -3 0)
+		(end -3 2.5)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "86adc016-12c0-42db-ac44-5fe22e677cf9")
+	)
+	(fp_line
+		(start -3 2.5)
+		(end 3 2.5)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "53529345-c05d-4c63-bae0-71124e32b68b")
+	)
+	(fp_line
+		(start 3 0)
+		(end -3 0)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "24531601-8729-41d3-8332-1e00e3235340")
+	)
+	(fp_line
+		(start 3 2.5)
+		(end 3 0)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "6997f7b1-fada-4bf6-b46a-c4adffb276b9")
+	)
+	(pad "R" thru_hole roundrect
+		(at 2.2 13.5)
+		(size 2 2.4)
+		(drill oval 0.8 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(roundrect_rratio 0.2)
+		(uuid "2c0a35a4-9d6f-406e-aaae-8082a2c9f516")
+	)
+	(pad "S" thru_hole roundrect
+		(at -2.2 13.5)
+		(size 2 2.4)
+		(drill oval 0.8 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(roundrect_rratio 0.2)
+		(uuid "bf0afcee-3565-498c-b06d-1899ddef681c")
+	)
+	(pad "T" thru_hole roundrect
+		(at -2.75 8)
+		(size 2 2.4)
+		(drill oval 0.8 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(roundrect_rratio 0.2)
+		(uuid "239f056b-616e-4e3e-a1d4-28c9e0e13b8b")
+	)
+	(pad "T" thru_hole roundrect
+		(at 2.75 8)
+		(size 2 2.4)
+		(drill oval 0.8 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(roundrect_rratio 0.2)
+		(uuid "b432d88f-2adc-4933-91fc-3f77f5af5853")
+	)
+	(embedded_fonts no)
+)

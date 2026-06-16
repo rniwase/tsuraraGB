@@ -1,3 +1,4 @@
 (sym_lib_table
-  (lib (name "TPS79901DDCR")(type "KiCad")(uri "${KIPRJMOD}/../common/sym/TPS79901DDCR.kicad_sym")(options "")(descr ""))
+	(version 7)
+	(lib (name "ProjectSpecific") (type "KiCad") (uri "${KIPRJMOD}/../lib/sym/") (options "") (descr ""))
 )
